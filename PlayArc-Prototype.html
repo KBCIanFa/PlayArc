@@ -1,0 +1,2304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlayArc — Playwright Automation Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #080E17;
+  --bg2:      #0D1520;
+  --bg3:      #111E2E;
+  --bg4:      #16263A;
+  --cyan:     #00D4FF;
+  --cyan2:    #00A8CC;
+  --cyan-glow:rgba(0,212,255,0.12);
+  --cyan-dim: rgba(0,212,255,0.08);
+  --green:    #00E5A0;
+  --green-dim:rgba(0,229,160,0.1);
+  --orange:   #FF8C42;
+  --orange-dim:rgba(255,140,66,0.1);
+  --red:      #FF4466;
+  --red-dim:  rgba(255,68,102,0.1);
+  --yellow:   #FFD166;
+  --yellow-dim:rgba(255,209,102,0.1);
+  --purple:   #A78BFA;
+  --t1:       #E2EEF8;
+  --t2:       #7A9BBF;
+  --t3:       #3A5470;
+  --border:   rgba(0,212,255,0.1);
+  --border2:  rgba(255,255,255,0.05);
+  --font-display: 'Syne', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+  --sidebar: 210px;
+  --topbar:  48px;
+  --radius:  8px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--t1);
+  font-size:13px;
+}
+
+/* ── SCROLLBAR ─────────────────────────── */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--t3);border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:var(--t2);}
+
+/* ── LAYOUT ────────────────────────────── */
+#app{display:flex;flex-direction:column;height:100vh;}
+
+/* TOP BAR */
+#topbar{
+  height:var(--topbar);
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 14px;gap:8px;
+  flex-shrink:0;
+  z-index:200;
+}
+
+.logo{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--font-display);
+  font-weight:800;font-size:15px;
+  letter-spacing:-0.5px;
+  color:var(--t1);
+  margin-right:16px;
+  text-decoration:none;
+}
+.logo-mark{
+  width:26px;height:26px;
+  border-radius:6px;
+  background:linear-gradient(135deg,var(--cyan),var(--cyan2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;
+  box-shadow:0 0 12px rgba(0,212,255,0.4);
+}
+.logo em{color:var(--cyan);font-style:normal;}
+
+.nav-tabs{display:flex;gap:2px;flex:1;}
+.nav-tab{
+  padding:5px 14px;
+  border-radius:6px;
+  font-size:12px;font-weight:500;
+  color:var(--t2);
+  cursor:pointer;
+  transition:all .15s;
+  display:flex;align-items:center;gap:6px;
+  border:1px solid transparent;
+  white-space:nowrap;
+}
+.nav-tab:hover{background:var(--border2);color:var(--t1);}
+.nav-tab.active{background:var(--cyan-dim);color:var(--cyan);border-color:var(--border);}
+.nav-tab .nt-icon{font-size:13px;opacity:.8;}
+
+.topbar-right{
+  display:flex;align-items:center;gap:8px;
+  margin-left:auto;
+}
+
+.env-tag{
+  display:flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:5px;
+  background:var(--bg3);
+  border:1px solid var(--border2);
+  font-size:11px;font-weight:600;
+  color:var(--t2);cursor:pointer;
+}
+.env-dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
+
+/* MAIN BODY */
+#body{display:flex;flex:1;overflow:hidden;}
+
+/* SIDEBAR */
+#sidebar{
+  width:var(--sidebar);
+  background:var(--bg2);
+  border-right:1px solid var(--border2);
+  display:flex;flex-direction:column;
+  flex-shrink:0;
+  overflow-y:auto;
+}
+
+.sb-section{padding:10px 8px 4px;}
+.sb-label{
+  font-size:9px;font-weight:700;
+  letter-spacing:1.4px;text-transform:uppercase;
+  color:var(--t3);
+  padding:0 8px 4px;
+}
+.sb-item{
+  display:flex;align-items:center;gap:7px;
+  padding:6px 9px;border-radius:6px;
+  font-size:12px;font-weight:500;
+  color:var(--t2);cursor:pointer;
+  transition:all .12s;margin-bottom:1px;
+  border:1px solid transparent;
+}
+.sb-item:hover{background:var(--border2);color:var(--t1);}
+.sb-item.active{background:var(--cyan-dim);color:var(--cyan);border-color:var(--border);}
+.sb-icon{font-size:13px;width:16px;text-align:center;flex-shrink:0;}
+.sb-badge{
+  margin-left:auto;
+  padding:1px 6px;border-radius:10px;
+  font-size:10px;font-weight:700;
+  background:var(--red);color:white;
+}
+.sb-badge.g{background:var(--green);color:var(--bg);}
+.sb-badge.b{background:var(--cyan2);color:white;}
+.sb-badge.o{background:var(--orange);color:var(--bg);}
+
+.sb-divider{height:1px;background:var(--border2);margin:6px 10px;}
+.sb-bottom{margin-top:auto;padding:8px;border-top:1px solid var(--border2);}
+
+/* PAGES */
+.page{display:none;flex-direction:column;flex:1;overflow:hidden;}
+.page.active{display:flex;}
+
+.page-head{
+  padding:14px 20px 10px;
+  border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;gap:10px;
+  flex-shrink:0;background:var(--bg2);
+}
+.page-title{
+  font-family:var(--font-display);
+  font-size:16px;font-weight:700;
+  color:var(--t1);
+}
+.page-sub{font-size:11px;color:var(--t3);margin-top:2px;}
+.page-acts{display:flex;gap:6px;align-items:center;margin-left:auto;}
+.page-body{flex:1;overflow:auto;padding:16px 20px;}
+
+/* ── BUTTONS ───────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 12px;border-radius:6px;
+  font-size:12px;font-weight:600;
+  font-family:var(--font-body);
+  border:none;cursor:pointer;
+  transition:all .15s;white-space:nowrap;
+}
+.btn-primary{background:var(--cyan);color:var(--bg);}
+.btn-primary:hover{background:#33DDFF;box-shadow:0 0 16px rgba(0,212,255,0.3);}
+.btn-success{background:var(--green);color:var(--bg);}
+.btn-success:hover{background:#33FFBB;}
+.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid rgba(255,68,102,.25);}
+.btn-danger:hover{background:rgba(255,68,102,.2);}
+.btn-ghost{
+  background:transparent;color:var(--t2);
+  border:1px solid var(--border2);
+}
+.btn-ghost:hover{color:var(--t1);border-color:var(--border);}
+.btn-sm{padding:3px 9px;font-size:11px;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ── CARDS ─────────────────────────────── */
+.card{
+  background:var(--bg3);
+  border:1px solid var(--border2);
+  border-radius:var(--radius);
+  padding:14px;
+}
+.card-head{
+  font-size:10px;font-weight:700;
+  letter-spacing:.8px;text-transform:uppercase;
+  color:var(--t3);margin-bottom:10px;
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+
+/* ── STAT CARDS ─────────────────────────── */
+.stat-val{
+  font-family:var(--font-display);
+  font-size:30px;font-weight:800;
+  line-height:1;color:var(--t1);
+}
+.stat-lbl{font-size:11px;color:var(--t2);margin-top:4px;}
+.stat-chip{
+  display:inline-block;margin-top:8px;
+  padding:2px 7px;border-radius:4px;
+  font-size:10px;font-weight:600;
+}
+.chip-up{background:var(--green-dim);color:var(--green);}
+.chip-dn{background:var(--red-dim);color:var(--red);}
+.chip-or{background:var(--orange-dim);color:var(--orange);}
+
+/* ── STATUS BADGES ──────────────────────── */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 7px;border-radius:4px;
+  font-size:10px;font-weight:700;
+}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;}
+.b-pass{background:var(--green-dim);color:var(--green);}
+.b-fail{background:var(--red-dim);color:var(--red);}
+.b-run{background:var(--cyan-dim);color:var(--cyan);}
+.b-skip{background:var(--yellow-dim);color:var(--yellow);}
+.b-heal{background:var(--orange-dim);color:var(--orange);}
+.b-queue{background:var(--border2);color:var(--t2);}
+
+/* ── TABLES ─────────────────────────────── */
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{
+  text-align:left;font-size:9px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;
+  color:var(--t3);padding:8px 10px;
+  border-bottom:1px solid var(--border2);
+}
+.tbl td{
+  padding:8px 10px;font-size:12px;color:var(--t2);
+  border-bottom:1px solid rgba(255,255,255,.025);
+}
+.tbl tr:hover td{background:var(--border2);color:var(--t1);}
+
+/* ── PROGRESS ───────────────────────────── */
+.pbar{height:3px;background:var(--border2);border-radius:3px;overflow:hidden;}
+.pbar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--cyan),var(--green));transition:width .5s ease;}
+.pbar-fill.red{background:linear-gradient(90deg,var(--orange),var(--red));}
+.pbar-fill.orange{background:linear-gradient(90deg,var(--yellow),var(--orange));}
+
+/* ── MINI SPARKLINES ────────────────────── */
+.spark{display:flex;align-items:flex-end;gap:2px;height:28px;margin-top:8px;}
+.spark-bar{flex:1;border-radius:1px 1px 0 0;opacity:.7;transition:opacity .2s;}
+.spark-bar:hover{opacity:1;}
+
+/* ── FORMS ──────────────────────────────── */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.form-field{display:flex;flex-direction:column;gap:3px;}
+.form-label{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);}
+.form-input,.form-select{
+  background:var(--bg);border:1px solid var(--border2);
+  border-radius:5px;padding:6px 9px;
+  font-size:12px;color:var(--t1);
+  font-family:var(--font-body);
+  transition:border-color .15s;
+}
+.form-input:focus,.form-select:focus{outline:none;border-color:var(--cyan);}
+.form-input.mono{font-family:var(--font-mono);font-size:11px;}
+.form-select{cursor:pointer;appearance:none;}
+textarea.form-input{resize:vertical;min-height:60px;}
+
+/* ── SECTION TITLE ──────────────────────── */
+.sec-title{
+  font-size:10px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--t3);
+  display:flex;align-items:center;gap:8px;
+  margin:12px 0 8px;
+}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border2);}
+
+/* ═══════════════════════════════════════════
+   PAGE: DASHBOARD
+═══════════════════════════════════════════ */
+.activity-item{
+  display:flex;align-items:flex-start;gap:9px;
+  padding:7px 0;
+  border-bottom:1px solid rgba(255,255,255,.03);
+  font-size:11px;
+}
+.act-dot{width:7px;height:7px;border-radius:50%;margin-top:3px;flex-shrink:0;}
+.act-time{font-size:10px;color:var(--t3);margin-top:2px;}
+.health-row{
+  display:flex;align-items:center;gap:10px;
+  padding:7px 0;
+  border-bottom:1px solid rgba(255,255,255,.03);
+}
+.health-name{width:150px;font-size:12px;color:var(--t2);flex-shrink:0;}
+.health-pct{font-size:11px;width:40px;text-align:right;flex-shrink:0;}
+
+/* ═══════════════════════════════════════════
+   PAGE: TEST BUILDER
+═══════════════════════════════════════════ */
+.builder-wrap{display:flex;flex:1;overflow:hidden;}
+
+.steps-panel{
+  width:320px;flex-shrink:0;
+  border-right:1px solid var(--border2);
+  display:flex;flex-direction:column;
+  background:var(--bg2);
+}
+.steps-head{
+  padding:10px 12px;
+  border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:600;color:var(--t2);
+  flex-shrink:0;
+}
+.step-list{flex:1;overflow-y:auto;padding:6px;}
+
+.step-card{
+  display:flex;align-items:center;gap:6px;
+  padding:8px 10px;border-radius:6px;
+  border:1px solid var(--border2);
+  background:var(--bg3);
+  margin-bottom:4px;cursor:grab;
+  transition:all .12s;
+  position:relative;user-select:none;
+}
+.step-card:hover{border-color:var(--border);background:var(--bg4);}
+.step-card.selected{border-color:var(--cyan);background:var(--cyan-dim);}
+.step-card.dragging{opacity:.4;border-style:dashed;}
+.step-card.drag-over{border-color:var(--cyan);border-style:dashed;}
+
+.step-num{
+  width:18px;height:18px;border-radius:50%;
+  background:var(--bg4);border:1px solid var(--border);
+  font-size:9px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--t3);flex-shrink:0;
+  font-family:var(--font-mono);
+}
+.step-card.selected .step-num{background:var(--cyan);color:var(--bg);border-color:var(--cyan);}
+
+.step-tag{
+  font-size:9px;font-weight:700;padding:2px 5px;
+  border-radius:3px;font-family:var(--font-mono);
+  text-transform:uppercase;flex-shrink:0;
+}
+.tag-nav{background:rgba(27,108,168,.25);color:#7EC8FF;}
+.tag-click{background:var(--green-dim);color:var(--green);}
+.tag-fill{background:var(--yellow-dim);color:var(--yellow);}
+.tag-assert{background:var(--orange-dim);color:var(--orange);}
+.tag-wait{background:var(--border2);color:var(--t2);}
+.tag-shot{background:var(--cyan-dim);color:var(--cyan);}
+.tag-js{background:rgba(167,139,250,.15);color:var(--purple);}
+.tag-select{background:rgba(255,209,102,.1);color:var(--yellow);}
+
+.step-desc{
+  font-size:11px;color:var(--t2);flex:1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.step-card.selected .step-desc{color:var(--t1);}
+
+.step-status{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+
+.step-acts{
+  display:flex;gap:3px;margin-left:auto;
+  opacity:0;transition:opacity .12s;
+}
+.step-card:hover .step-acts{opacity:1;}
+.step-card.selected .step-acts{opacity:1;}
+.sact{
+  width:18px;height:18px;border-radius:3px;
+  background:var(--bg);border:1px solid var(--border2);
+  color:var(--t3);font-size:9px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .12s;
+}
+.sact:hover{color:var(--cyan);border-color:var(--border);}
+.sact.del:hover{color:var(--red);border-color:rgba(255,68,102,.3);}
+
+.add-bar{
+  padding:10px;border-top:1px solid var(--border2);
+  background:var(--bg2);flex-shrink:0;
+}
+.add-bar-label{font-size:9px;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;}
+.add-btns{display:flex;gap:4px;flex-wrap:wrap;}
+.add-type-btn{
+  padding:3px 8px;border-radius:4px;
+  font-size:10px;font-weight:700;
+  border:1px solid var(--border2);
+  background:var(--bg);color:var(--t2);
+  cursor:pointer;font-family:var(--font-mono);
+  transition:all .12s;
+}
+.add-type-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+
+/* Editor panel */
+.editor-panel{
+  flex:1;display:flex;flex-direction:column;overflow:hidden;
+}
+.editor-tabs{
+  display:flex;border-bottom:1px solid var(--border2);
+  padding:0 14px;flex-shrink:0;background:var(--bg2);
+}
+.editor-tab{
+  padding:9px 14px;font-size:11px;font-weight:600;
+  color:var(--t3);cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .12s;
+}
+.editor-tab.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.editor-tab:hover:not(.active){color:var(--t2);}
+.editor-body{flex:1;overflow:auto;padding:14px;}
+
+.locator-row{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 9px;border-radius:5px;
+  background:var(--bg);border:1px solid var(--border2);
+  margin-bottom:3px;
+}
+.loc-type{font-size:9px;font-weight:700;color:var(--cyan);font-family:var(--font-mono);width:80px;flex-shrink:0;}
+.loc-val{font-size:10px;color:var(--t2);font-family:var(--font-mono);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.loc-badge{font-size:9px;font-weight:700;margin-left:auto;}
+
+.heal-box{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border-radius:6px;
+  background:var(--green-dim);border:1px solid rgba(0,229,160,.2);
+  margin-bottom:8px;
+}
+.heal-num{
+  font-family:var(--font-display);
+  font-size:24px;font-weight:800;color:var(--green);
+}
+
+/* ═══════════════════════════════════════════
+   PAGE: LIVE RUNNER
+═══════════════════════════════════════════ */
+.runner-wrap{display:flex;flex:1;overflow:hidden;}
+
+.log-panel{
+  flex:1;display:flex;flex-direction:column;
+  border-right:1px solid var(--border2);
+}
+.log-head{
+  padding:9px 14px;border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;gap:8px;
+  flex-shrink:0;background:var(--bg2);
+}
+.pulse{
+  width:7px;height:7px;border-radius:50%;background:var(--green);
+  animation:pulse 1.4s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,229,160,.4);}50%{opacity:.5;box-shadow:0 0 0 5px rgba(0,229,160,0);}}
+.pulse.red{background:var(--red);animation:pulse-r 1.4s infinite;}
+@keyframes pulse-r{0%,100%{box-shadow:0 0 0 0 rgba(255,68,102,.4);}50%{box-shadow:0 0 0 5px rgba(255,68,102,0);}}
+.pulse.off{background:var(--t3);animation:none;}
+
+.log-stream{flex:1;overflow-y:auto;padding:6px 8px;font-family:var(--font-mono);font-size:10.5px;}
+
+.log-entry{
+  display:flex;align-items:flex-start;gap:8px;
+  padding:3px 6px;border-radius:3px;
+  line-height:1.5;cursor:default;
+}
+.log-entry:hover{background:var(--border2);}
+.log-t{color:var(--t3);flex-shrink:0;width:56px;}
+.log-k{flex-shrink:0;font-weight:700;width:36px;}
+.log-k.info{color:var(--cyan);}
+.log-k.pass{color:var(--green);}
+.log-k.fail{color:var(--red);}
+.log-k.warn{color:var(--yellow);}
+.log-k.heal{color:var(--orange);}
+.log-k.step{color:var(--purple);}
+.log-msg{color:var(--t2);flex:1;}
+.log-entry.current{background:var(--cyan-dim);}
+.log-entry.err{background:var(--red-dim);}
+
+.log-foot{
+  padding:8px 14px;border-top:1px solid var(--border2);
+  display:flex;gap:16px;flex-shrink:0;
+  background:var(--bg2);font-size:11px;
+}
+.lf-stat{display:flex;align-items:center;gap:4px;}
+
+/* Runner side */
+.runner-side{
+  width:320px;display:flex;flex-direction:column;
+  flex-shrink:0;overflow:hidden;
+}
+
+.preview-box{
+  padding:10px;border-bottom:1px solid var(--border2);
+  flex-shrink:0;
+}
+.preview-label{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);margin-bottom:6px;}
+.preview-screen{
+  width:100%;aspect-ratio:16/9;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:5px;overflow:hidden;position:relative;
+}
+
+/* Browser mockup */
+.bmock{position:absolute;inset:6px;background:var(--bg3);border-radius:4px;overflow:hidden;display:flex;flex-direction:column;}
+.bmock-bar{height:16px;background:var(--bg4);display:flex;align-items:center;padding:0 5px;gap:3px;flex-shrink:0;}
+.bmock-dot{width:4px;height:4px;border-radius:50%;}
+.bmock-url{flex:1;height:8px;background:var(--bg);border-radius:2px;margin-left:3px;}
+.bmock-content{flex:1;padding:5px;display:flex;flex-direction:column;gap:3px;overflow:hidden;}
+.bmock-row{height:6px;border-radius:1px;background:var(--border2);}
+.bmock-hl{border:2px solid var(--cyan);border-radius:2px;padding:2px;display:flex;align-items:center;justify-content:center;font-size:7px;color:var(--cyan);font-family:var(--font-mono);}
+.bmock-form{display:flex;flex-direction:column;gap:3px;max-width:80%;}
+.bmock-inp{height:8px;background:var(--bg4);border:1px solid var(--border);border-radius:2px;}
+.bmock-btn{height:10px;background:var(--cyan2);border-radius:2px;opacity:.8;}
+
+.step-prog-list{flex:1;overflow-y:auto;padding:6px;}
+.sp-item{
+  display:flex;align-items:center;gap:7px;
+  padding:5px 7px;border-radius:5px;
+  margin-bottom:2px;font-size:10px;
+  border:1px solid transparent;transition:all .15s;
+}
+.sp-item.done{border-color:rgba(0,229,160,.1);}
+.sp-item.current{border-color:var(--cyan);background:var(--cyan-dim);}
+.sp-item.fail{border-color:rgba(255,68,102,.2);background:var(--red-dim);}
+.sp-item.pending{opacity:.35;}
+.sp-icon{font-size:12px;flex-shrink:0;}
+.sp-txt{font-family:var(--font-mono);color:var(--t2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sp-dur{font-size:9px;color:var(--t3);}
+
+/* ═══════════════════════════════════════════
+   PAGE: ELEMENT INSPECTOR
+═══════════════════════════════════════════ */
+.insp-wrap{display:flex;flex:1;overflow:hidden;}
+
+.insp-browser{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--border2);}
+.browser-bar2{
+  background:var(--bg3);border-bottom:1px solid var(--border2);
+  padding:7px 10px;display:flex;align-items:center;gap:6px;flex-shrink:0;
+}
+.url-input{
+  flex:1;background:var(--bg);border:1px solid var(--border2);
+  border-radius:5px;padding:4px 9px;
+  font-size:11px;font-family:var(--font-mono);color:var(--cyan);
+}
+.browser-vp{flex:1;background:var(--bg);position:relative;overflow:hidden;}
+
+/* Simulated page */
+.sim-page{
+  position:absolute;inset:12px;
+  background:#f8fafc;border-radius:5px;
+  overflow:hidden;font-family:sans-serif;
+}
+.sim-nav{
+  height:40px;background:#1e293b;display:flex;align-items:center;padding:0 16px;gap:12px;
+}
+.sim-nav-item{height:6px;background:rgba(255,255,255,.2);border-radius:3px;}
+.sim-body{padding:16px;}
+.sim-card{
+  background:white;border-radius:6px;
+  border:1px solid #e2e8f0;padding:16px;
+  max-width:340px;box-shadow:0 1px 3px rgba(0,0,0,.08);
+}
+.sim-title{font-size:14px;font-weight:700;color:#1e293b;margin-bottom:4px;}
+.sim-sub{font-size:11px;color:#64748b;margin-bottom:12px;}
+.sim-inp-wrap{display:flex;flex-direction:column;gap:6px;}
+.sim-lbl{font-size:10px;font-weight:600;color:#475569;}
+.sim-inp{height:28px;border:1px solid #cbd5e1;border-radius:4px;background:white;padding:0 8px;width:100%;}
+.sim-inp.hl{border-color:#00D4FF;box-shadow:0 0 0 3px rgba(0,212,255,.15);}
+.sim-btn{
+  margin-top:8px;height:32px;background:#0ea5e9;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:600;color:white;cursor:pointer;
+  border:none;width:100%;
+}
+
+/* Highlight overlay */
+.hl-overlay{
+  position:absolute;border:2px solid var(--cyan);
+  background:rgba(0,212,255,.08);border-radius:3px;
+  pointer-events:none;
+  box-shadow:0 0 12px rgba(0,212,255,.3);
+  transition:all .3s ease;
+}
+.hl-tooltip{
+  position:absolute;background:var(--bg2);
+  border:1px solid var(--cyan);border-radius:5px;
+  padding:4px 8px;font-family:var(--font-mono);
+  font-size:9px;color:var(--cyan);white-space:nowrap;
+  pointer-events:none;
+  box-shadow:0 4px 12px rgba(0,0,0,.4);
+}
+
+/* Inspector sidebar */
+.insp-panel{width:300px;display:flex;flex-direction:column;flex-shrink:0;}
+.insp-head{padding:10px 14px;border-bottom:1px solid var(--border2);font-size:11px;font-weight:600;color:var(--t2);flex-shrink:0;background:var(--bg2);}
+.insp-body{flex:1;overflow-y:auto;padding:10px;}
+
+.attr-row{
+  display:flex;gap:8px;padding:4px 7px;border-radius:4px;
+  font-size:10px;border-bottom:1px solid rgba(255,255,255,.025);
+}
+.attr-row:hover{background:var(--border2);}
+.attr-k{color:var(--cyan);font-family:var(--font-mono);width:100px;flex-shrink:0;}
+.attr-v{color:var(--t2);font-family:var(--font-mono);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.attr-v.green{color:var(--green);}
+
+.ai-box{
+  background:linear-gradient(135deg,rgba(0,212,255,.05),rgba(0,229,160,.05));
+  border:1px solid rgba(0,212,255,.15);
+  border-radius:6px;padding:9px 10px;margin-bottom:8px;
+}
+.ai-label{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--cyan);margin-bottom:4px;display:flex;align-items:center;gap:4px;}
+.ai-text{font-size:11px;color:var(--t2);line-height:1.5;}
+code{font-family:var(--font-mono);font-size:10px;background:var(--bg);padding:1px 4px;border-radius:3px;color:var(--cyan);}
+
+/* ═══════════════════════════════════════════
+   PAGE: REPORTS
+═══════════════════════════════════════════ */
+.donut-wrap{display:flex;align-items:center;gap:16px;}
+.donut{
+  width:72px;height:72px;border-radius:50%;flex-shrink:0;
+  position:relative;
+}
+.donut-hole{
+  position:absolute;inset:12px;background:var(--bg3);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-size:13px;font-weight:800;color:var(--t1);
+}
+.legend{display:flex;flex-direction:column;gap:4px;}
+.legend-row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2);}
+.ldot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+.trend-wrap{height:50px;display:flex;align-items:flex-end;gap:3px;margin-top:8px;}
+.trend-b{flex:1;border-radius:2px 2px 0 0;opacity:.7;min-height:4px;cursor:pointer;transition:opacity .15s;}
+.trend-b:hover{opacity:1;}
+
+/* Failure card */
+.fail-card{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:9px 10px;border-radius:6px;
+  background:var(--bg3);border:1px solid var(--border2);
+  margin-bottom:6px;transition:border-color .12s;cursor:pointer;
+}
+.fail-card:hover{border-color:var(--border);}
+.fail-icon{font-size:18px;flex-shrink:0;}
+.fail-body{flex:1;}
+.fail-title{font-size:12px;font-weight:600;color:var(--t1);margin-bottom:2px;}
+.fail-sub{font-size:10px;color:var(--t3);}
+.fail-meta{font-size:10px;color:var(--red);font-family:var(--font-mono);}
+
+/* Self-heal card */
+.heal-card{
+  display:flex;align-items:center;gap:9px;
+  padding:7px 10px;border-radius:6px;margin-bottom:5px;
+  font-size:11px;
+}
+.heal-card.ok{background:var(--green-dim);border:1px solid rgba(0,229,160,.15);}
+.heal-card.warn{background:var(--red-dim);border:1px solid rgba(255,68,102,.15);}
+
+/* ═══════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════ */
+.modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
+  z-index:999;align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:10px;padding:20px;
+  min-width:360px;max-width:480px;width:90%;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.modal-title{font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--t1);margin-bottom:14px;}
+.modal-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+
+/* ═══════════════════════════════════════════
+   MISC
+═══════════════════════════════════════════ */
+.tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9px;background:var(--border2);color:var(--t2);}
+.tag-list{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px;}
+.kbd{display:inline-flex;align-items:center;padding:1px 5px;border-radius:3px;font-family:var(--font-mono);font-size:9px;background:var(--bg);border:1px solid var(--border);color:var(--t2);}
+.flex-center{display:flex;align-items:center;justify-content:center;}
+.gap6{gap:6px;}
+.mt4{margin-top:4px;}
+.mt8{margin-top:8px;}
+.w100{width:100%;}
+.mono{font-family:var(--font-mono);}
+.text-cyan{color:var(--cyan);}
+.text-green{color:var(--green);}
+.text-red{color:var(--red);}
+.text-orange{color:var(--orange);}
+.text-t2{color:var(--t2);}
+
+/* notification toast */
+.toast{
+  position:fixed;bottom:20px;right:20px;z-index:9999;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;padding:10px 14px;
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--t1);
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+  transform:translateY(80px);opacity:0;
+  transition:all .3s ease;pointer-events:none;
+  max-width:340px;
+}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast-icon{font-size:16px;flex-shrink:0;}
+
+/* Drag placeholder */
+.drag-placeholder{
+  height:40px;border:2px dashed var(--cyan);
+  border-radius:6px;margin-bottom:4px;
+  background:var(--cyan-dim);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:var(--cyan);
+}
+
+/* empty state */
+.empty{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:8px;padding:40px;
+  color:var(--t3);font-size:12px;text-align:center;
+}
+.empty-icon{font-size:32px;opacity:.4;}
+
+/* Run config panel */
+.run-config{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 14px;border-bottom:1px solid var(--border2);
+  background:var(--bg2);flex-shrink:0;flex-wrap:wrap;
+}
+.rc-label{font-size:10px;color:var(--t3);font-weight:600;}
+.browser-pill{
+  padding:3px 9px;border-radius:4px;font-size:11px;font-weight:600;
+  border:1px solid var(--border2);cursor:pointer;color:var(--t2);
+  transition:all .12s;
+}
+.browser-pill.active{background:var(--cyan-dim);border-color:var(--border);color:var(--cyan);}
+.speed-select{
+  background:var(--bg);border:1px solid var(--border2);
+  border-radius:5px;padding:3px 8px;font-size:11px;color:var(--t1);
+  font-family:var(--font-body);cursor:pointer;
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ── TOP BAR ───────────────────────────────── -->
+<div id="topbar">
+  <a class="logo" href="#">
+    <div class="logo-mark">🎭</div>
+    Play<em>Arc</em>
+  </a>
+
+  <div class="nav-tabs">
+    <div class="nav-tab active" data-page="dashboard"><span class="nt-icon">📊</span>Dashboard</div>
+    <div class="nav-tab" data-page="builder"><span class="nt-icon">🔧</span>Test Builder</div>
+    <div class="nav-tab" data-page="runner"><span class="nt-icon">▶</span>Live Runner</div>
+    <div class="nav-tab" data-page="inspector"><span class="nt-icon">🔍</span>Inspector</div>
+    <div class="nav-tab" data-page="reports"><span class="nt-icon">📈</span>Reports</div>
+  </div>
+
+  <div class="topbar-right">
+    <div class="env-tag" id="envTag" onclick="cycleEnv()">
+      <div class="env-dot"></div>
+      <span id="envLabel">Staging</span>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="showModal('suiteModal')">+ New Suite</button>
+    <button class="btn btn-primary btn-sm" onclick="startRun()">▶ Run Suite</button>
+  </div>
+</div>
+
+<div id="body">
+
+<!-- ── SIDEBAR ───────────────────────────────── -->
+<div id="sidebar">
+  <div class="sb-section">
+    <div class="sb-label">Project</div>
+    <div class="sb-item active" data-page="dashboard"><span class="sb-icon">🏠</span>Dashboard</div>
+    <div class="sb-item" data-page="builder"><span class="sb-icon">📝</span>Test Builder</div>
+    <div class="sb-item"><span class="sb-icon">📁</span>Test Suites<span class="sb-badge b">3</span></div>
+    <div class="sb-item"><span class="sb-icon">🎯</span>Element Repo</div>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-section">
+    <div class="sb-label">Execution</div>
+    <div class="sb-item" data-page="runner"><span class="sb-icon">▶</span>Run History<span class="sb-badge g" id="sbRunCount">0</span></div>
+    <div class="sb-item"><span class="sb-icon">⏳</span>Job Queue<span class="sb-badge o">2</span></div>
+    <div class="sb-item"><span class="sb-icon">📅</span>Schedules</div>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-section">
+    <div class="sb-label">Analytics</div>
+    <div class="sb-item" data-page="reports"><span class="sb-icon">📈</span>Reports</div>
+    <div class="sb-item"><span class="sb-icon">🔥</span>Flaky Tests<span class="sb-badge">4</span></div>
+    <div class="sb-item"><span class="sb-icon">🩹</span>Self-Healed<span class="sb-badge g" id="sbHealCount">7</span></div>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-section">
+    <div class="sb-label">Integrations</div>
+    <div class="sb-item"><span class="sb-icon">🐙</span>GitHub Actions</div>
+    <div class="sb-item"><span class="sb-icon">🐛</span>Jira</div>
+    <div class="sb-item"><span class="sb-icon">💬</span>Slack</div>
+  </div>
+  <div class="sb-bottom">
+    <div class="sb-item"><span class="sb-icon">⚙</span>Settings</div>
+    <div class="sb-item"><span class="sb-icon">📚</span>Docs</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: DASHBOARD
+═══════════════════════════════════════════ -->
+<div class="page active" id="page-dashboard">
+  <div class="page-head">
+    <div>
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub" id="dashSub">E-Commerce Platform · Last run: never</div>
+    </div>
+    <div class="page-acts">
+      <button class="btn btn-ghost btn-sm" onclick="exportReport()">📤 Export</button>
+      <button class="btn btn-success btn-sm" onclick="startRun()">▶ Run All Suites</button>
+    </div>
+  </div>
+  <div class="page-body">
+
+    <!-- Stats -->
+    <div class="grid4" style="margin-bottom:14px">
+      <div class="card">
+        <div class="card-head">Total Runs</div>
+        <div class="stat-val" id="statRuns">0</div>
+        <div class="stat-lbl">All time</div>
+        <div class="spark" id="sparkRuns"></div>
+      </div>
+      <div class="card">
+        <div class="card-head">Pass Rate</div>
+        <div class="stat-val text-green" id="statPass">—</div>
+        <div class="stat-lbl" id="statPassLbl">No runs yet</div>
+        <div class="stat-chip chip-up" id="statPassChip" style="display:none"></div>
+      </div>
+      <div class="card">
+        <div class="card-head">Avg Duration</div>
+        <div class="stat-val" id="statDur">—</div>
+        <div class="stat-lbl">Per suite</div>
+      </div>
+      <div class="card">
+        <div class="card-head">Self-Healed</div>
+        <div class="stat-val text-orange" id="statHeal">7</div>
+        <div class="stat-lbl">Locators fixed</div>
+        <div class="stat-chip chip-or">3 need review</div>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-bottom:14px">
+      <!-- Recent Runs -->
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:12px 14px 8px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;">
+          <div class="card-head" style="margin:0">Recent Runs</div>
+          <button class="btn btn-ghost btn-sm" onclick="switchPage('runner')">View All →</button>
+        </div>
+        <table class="tbl">
+          <thead><tr><th>Suite</th><th>Status</th><th>Browser</th><th>Duration</th><th>Time</th></tr></thead>
+          <tbody id="recentRunsTable"><tr><td colspan="5" style="text-align:center;color:var(--t3);padding:20px">No runs yet — click ▶ Run All Suites</td></tr></tbody>
+        </table>
+      </div>
+
+      <!-- Activity Feed -->
+      <div class="card">
+        <div class="card-head">Live Activity</div>
+        <div id="activityFeed">
+          <div class="activity-item">
+            <div class="act-dot" style="background:var(--orange)"></div>
+            <div><div>Self-healing fixed <code>#checkout-btn</code> → <code>[data-testid]</code></div><div class="act-time">2 minutes ago</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot" style="background:var(--cyan)"></div>
+            <div><div>Suite <strong style="color:var(--t1)">Login Flow</strong> scheduled via GitHub Actions</div><div class="act-time">8 minutes ago</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot" style="background:var(--t3)"></div>
+            <div><div>New test step added to <strong style="color:var(--t1)">Checkout E2E</strong></div><div class="act-time">15 minutes ago</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Suite Health -->
+    <div class="card">
+      <div class="card-head">Suite Health</div>
+      <div id="suiteHealth"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: TEST BUILDER
+═══════════════════════════════════════════ -->
+<div class="page" id="page-builder">
+  <div class="page-head">
+    <div>
+      <div class="page-title">Test Builder — <span class="text-cyan" id="builderSuiteName">Login Flow</span></div>
+      <div class="page-sub" id="builderSub">0 steps · Chrome · Staging</div>
+    </div>
+    <div class="page-acts">
+      <select class="form-select" style="padding:4px 9px;font-size:11px" id="suiteSelector" onchange="loadSuite(this.value)">
+        <option value="0">Login Flow</option>
+        <option value="1">Checkout E2E</option>
+        <option value="2">Search & Filter</option>
+      </select>
+      <button class="btn btn-ghost btn-sm" onclick="saveSuite()">💾 Save</button>
+      <button class="btn btn-success btn-sm" onclick="runCurrentSuite()">▶ Run</button>
+    </div>
+  </div>
+
+  <div class="builder-wrap">
+    <!-- Steps Panel -->
+    <div class="steps-panel">
+      <div class="steps-head">
+        <span>Steps</span>
+        <span style="color:var(--t3);font-size:10px;margin-left:auto" id="stepCount">0 steps</span>
+      </div>
+      <div class="step-list" id="stepList"></div>
+      <div class="add-bar">
+        <div class="add-bar-label">+ Add Step</div>
+        <div class="add-btns">
+          <button class="add-type-btn" onclick="addStep('navigate')">NAV</button>
+          <button class="add-type-btn" onclick="addStep('click')">CLICK</button>
+          <button class="add-type-btn" onclick="addStep('fill')">FILL</button>
+          <button class="add-type-btn" onclick="addStep('assert_text')">ASSERT</button>
+          <button class="add-type-btn" onclick="addStep('wait')">WAIT</button>
+          <button class="add-type-btn" onclick="addStep('screenshot')">SHOT</button>
+          <button class="add-type-btn" onclick="addStep('select')">SELECT</button>
+          <button class="add-type-btn" onclick="addStep('js')">JS</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editor Panel -->
+    <div class="editor-panel">
+      <div class="editor-tabs">
+        <div class="editor-tab active" data-tab="manual">Manual View</div>
+        <div class="editor-tab" data-tab="script">Script View</div>
+        <div class="editor-tab" data-tab="ai">✨ AI Suggest</div>
+      </div>
+      <div class="editor-body" id="editorBody">
+        <div class="empty"><div class="empty-icon">👈</div>Select a step to edit, or add a new step</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: LIVE RUNNER
+═══════════════════════════════════════════ -->
+<div class="page" id="page-runner">
+  <div class="page-head">
+    <div>
+      <div class="page-title">Live Runner</div>
+      <div class="page-sub" id="runnerSub">Ready — select a suite and click Run</div>
+    </div>
+    <div class="page-acts">
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px" id="runStatus">
+        <div class="pulse off" id="runPulse"></div>
+        <span id="runStatusText" style="color:var(--t2)">Idle</span>
+      </div>
+      <button class="btn btn-danger btn-sm" id="stopBtn" onclick="stopRun()" disabled>⏹ Stop</button>
+      <button class="btn btn-success btn-sm" onclick="runCurrentSuite()">▶ Run Suite</button>
+    </div>
+  </div>
+
+  <div class="run-config">
+    <span class="rc-label">BROWSER:</span>
+    <div class="browser-pill active" onclick="selectBrowser(this,'chromium')">🌐 Chrome</div>
+    <div class="browser-pill" onclick="selectBrowser(this,'firefox')">🦊 Firefox</div>
+    <div class="browser-pill" onclick="selectBrowser(this,'webkit')">🍎 Safari</div>
+    <span class="rc-label" style="margin-left:10px">SPEED:</span>
+    <select class="speed-select" id="speedSelect">
+      <option value="0">Fast</option>
+      <option value="300">Normal</option>
+      <option value="800">Slow</option>
+    </select>
+    <span class="rc-label" style="margin-left:10px">SUITE:</span>
+    <select class="speed-select" id="runSuiteSelect">
+      <option value="0">Login Flow</option>
+      <option value="1">Checkout E2E</option>
+      <option value="2">Search & Filter</option>
+    </select>
+    <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t2);margin-left:8px;cursor:pointer">
+      <input type="checkbox" id="headlessCheck" checked style="accent-color:var(--cyan)"> Headless
+    </label>
+  </div>
+
+  <div class="runner-wrap">
+    <!-- Log Stream -->
+    <div class="log-panel">
+      <div class="log-head">
+        <div class="pulse off" id="logPulse"></div>
+        <span style="font-size:11px;font-weight:600">Log Stream</span>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="clearLog()">🗑 Clear</button>
+        <span style="font-size:10px;color:var(--t3)" id="wsStatus">● disconnected</span>
+      </div>
+      <div class="log-stream" id="logStream">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;color:var(--t3);">
+          <div style="font-size:28px;opacity:.3">▶</div>
+          <div style="font-size:11px">Click Run Suite to start execution</div>
+        </div>
+      </div>
+      <div class="log-foot">
+        <div class="lf-stat"><span style="color:var(--green)">✓</span><span id="lfPass" style="color:var(--green)">0</span></div>
+        <div class="lf-stat"><span style="color:var(--red)">✗</span><span id="lfFail" style="color:var(--red)">0</span></div>
+        <div class="lf-stat"><span style="color:var(--orange)">⚡</span><span id="lfHeal" style="color:var(--orange)">0</span></div>
+        <div class="lf-stat" style="margin-left:auto;color:var(--t3)"><span>⏱</span><span id="lfTime">0.0s</span></div>
+      </div>
+    </div>
+
+    <!-- Runner Side -->
+    <div class="runner-side">
+      <div class="preview-box">
+        <div class="preview-label">Live Preview</div>
+        <div class="preview-screen">
+          <div class="bmock" id="bmock">
+            <div class="bmock-bar">
+              <div class="bmock-dot" style="background:#FF5F57"></div>
+              <div class="bmock-dot" style="background:#FEBC2E"></div>
+              <div class="bmock-dot" style="background:#28C840"></div>
+              <div class="bmock-url" id="bmockUrl"></div>
+            </div>
+            <div class="bmock-content" id="bmockContent">
+              <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--t3);font-size:10px">Waiting for run...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:7px 10px;border-bottom:1px solid var(--border2);font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);flex-shrink:0;background:var(--bg2)">Step Progress</div>
+      <div class="step-prog-list" id="stepProgList">
+        <div class="empty"><div class="empty-icon" style="font-size:20px">○</div>No run in progress</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: INSPECTOR
+═══════════════════════════════════════════ -->
+<div class="page" id="page-inspector">
+  <div class="page-head">
+    <div>
+      <div class="page-title">Element Inspector</div>
+      <div class="page-sub">Point-and-click DOM selector capture</div>
+    </div>
+    <div class="page-acts">
+      <button class="btn btn-ghost btn-sm" onclick="copySelector()">📋 Copy Selector</button>
+      <button class="btn btn-ghost btn-sm" onclick="saveElement()">💾 Save to Repo</button>
+      <button class="btn btn-primary btn-sm" id="inspectToggle" onclick="toggleInspect()">🔍 Inspect: ON</button>
+    </div>
+  </div>
+
+  <div class="insp-wrap">
+    <!-- Browser -->
+    <div class="insp-browser">
+      <div class="browser-bar2">
+        <button class="btn btn-ghost btn-sm">←</button>
+        <button class="btn btn-ghost btn-sm">→</button>
+        <button class="btn btn-ghost btn-sm" onclick="reloadSim()">↻</button>
+        <input class="url-input" id="simUrl" value="https://staging.example.com/login" onkeypress="if(event.key==='Enter')reloadSim()">
+        <button class="btn btn-primary btn-sm" onclick="reloadSim()">Go</button>
+      </div>
+      <div class="browser-vp" id="browserVp">
+        <div class="sim-page" id="simPage">
+          <div class="sim-nav">
+            <div class="sim-nav-item" style="width:60px"></div>
+            <div class="sim-nav-item" style="width:40px"></div>
+            <div class="sim-nav-item" style="width:50px"></div>
+            <div class="sim-nav-item" style="width:35px"></div>
+          </div>
+          <div class="sim-body">
+            <div class="sim-card">
+              <div class="sim-title">Sign In</div>
+              <div class="sim-sub">Enter your credentials to continue</div>
+              <div class="sim-inp-wrap">
+                <div class="sim-lbl">Email Address</div>
+                <input class="sim-inp" id="simEmail" data-testid="email-input" placeholder="user@example.com" readonly>
+                <div class="sim-lbl" style="margin-top:4px">Password</div>
+                <input class="sim-inp" id="simPass" data-testid="password-input" type="password" placeholder="••••••••" readonly>
+                <button class="sim-btn" id="simLoginBtn" data-testid="login-btn" aria-label="Sign In">Sign In</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Highlight overlay -->
+        <div class="hl-overlay" id="hlOverlay" style="display:none"></div>
+        <div class="hl-tooltip" id="hlTooltip" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- Inspector Panel -->
+    <div class="insp-panel">
+      <div class="insp-head">
+        Captured: <span class="text-cyan" id="capturedName">Hover over an element</span>
+      </div>
+      <div class="insp-body">
+        <div class="sec-title">Element Properties</div>
+        <div id="attrList">
+          <div style="color:var(--t3);font-size:11px;text-align:center;padding:20px">Click an element to inspect</div>
+        </div>
+
+        <div class="sec-title">Generated Locators</div>
+        <div id="locatorList">
+          <div style="color:var(--t3);font-size:11px;text-align:center;padding:10px">No element selected</div>
+        </div>
+
+        <div class="sec-title">AI Insight</div>
+        <div id="aiInsight">
+          <div style="color:var(--t3);font-size:11px;text-align:center;padding:10px">Select an element to get AI suggestions</div>
+        </div>
+
+        <div id="inspActBtns" style="display:none;margin-top:10px">
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-primary w100" onclick="addToTest()">+ Add to Test Step</button>
+            <button class="btn btn-ghost" onclick="copySelector()">📋</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: REPORTS
+═══════════════════════════════════════════ -->
+<div class="page" id="page-reports">
+  <div class="page-head">
+    <div>
+      <div class="page-title">Reports & Analytics</div>
+      <div class="page-sub">All suites · All time</div>
+    </div>
+    <div class="page-acts">
+      <button class="btn btn-ghost btn-sm" onclick="exportReport()">📤 Export Allure</button>
+      <button class="btn btn-primary btn-sm" onclick="startRun()">▶ New Run</button>
+    </div>
+  </div>
+  <div class="page-body">
+
+    <div class="grid4" style="margin-bottom:14px">
+      <div class="card"><div class="card-head">Total Runs</div><div class="stat-val" id="rStatRuns">0</div><div class="stat-lbl">All time</div></div>
+      <div class="card"><div class="card-head">Pass Rate</div><div class="stat-val text-green" id="rStatPass">—</div><div class="stat-lbl">Overall</div></div>
+      <div class="card"><div class="card-head">Avg Duration</div><div class="stat-val" id="rStatDur">—</div><div class="stat-lbl">Per run</div></div>
+      <div class="card"><div class="card-head">Self-Healed</div><div class="stat-val text-orange" id="rStatHeal">7</div><div class="stat-lbl">Locators auto-fixed</div></div>
+    </div>
+
+    <div class="grid2" style="margin-bottom:14px">
+      <div class="card">
+        <div class="card-head">Pass / Fail Distribution</div>
+        <div class="donut-wrap" style="margin-top:8px">
+          <div class="donut" id="donutChart" style="background:conic-gradient(var(--t3) 0%, var(--t3) 100%)">
+            <div class="donut-hole" id="donutPct">—</div>
+          </div>
+          <div class="legend">
+            <div class="legend-row"><div class="ldot" style="background:var(--green)"></div><span id="lgPass">Passed: 0</span></div>
+            <div class="legend-row"><div class="ldot" style="background:var(--red)"></div><span id="lgFail">Failed: 0</span></div>
+            <div class="legend-row"><div class="ldot" style="background:var(--yellow)"></div><span id="lgSkip">Flaky: 4</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">Run History Trend</div>
+        <div class="trend-wrap" id="trendChart">
+          <div style="display:flex;align-items:center;justify-content:center;width:100%;color:var(--t3);font-size:11px">Run tests to see trend</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--t3);margin-top:4px">
+          <span>Oldest</span><span>Latest</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px;padding:0;overflow:hidden">
+      <div style="padding:12px 14px;border-bottom:1px solid var(--border2)">
+        <div class="card-head" style="margin:0">Run Log</div>
+      </div>
+      <table class="tbl">
+        <thead><tr><th>#</th><th>Suite</th><th>Status</th><th>Passed</th><th>Failed</th><th>Duration</th><th>Browser</th><th>Time</th></tr></thead>
+        <tbody id="reportRunTable">
+          <tr><td colspan="8" style="text-align:center;color:var(--t3);padding:20px">No runs yet</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-head">Self-Healing Activity</div>
+      <div class="heal-card ok">
+        <span style="font-size:16px">⚡</span>
+        <div style="flex:1">
+          <div style="font-size:11px;font-weight:600;color:var(--t1)">#checkout-btn → [data-testid="checkout-btn"]</div>
+          <div style="font-size:10px;color:var(--t3)">CSS class changed after deploy · ARIA fallback succeeded</div>
+        </div>
+        <span class="badge b-pass">healed</span>
+      </div>
+      <div class="heal-card ok">
+        <span style="font-size:16px">⚡</span>
+        <div style="flex:1">
+          <div style="font-size:11px;font-weight:600;color:var(--t1)">.login-form button → role=button[name='Login']</div>
+          <div style="font-size:10px;color:var(--t3)">DOM structure refactored after React upgrade</div>
+        </div>
+        <span class="badge b-pass">healed</span>
+      </div>
+      <div class="heal-card warn">
+        <span style="font-size:16px">⚠</span>
+        <div style="flex:1">
+          <div style="font-size:11px;font-weight:600;color:var(--t1)">#payment-confirm — all fallbacks failed</div>
+          <div style="font-size:10px;color:var(--t3)">Element removed from DOM · Manual update required</div>
+        </div>
+        <span class="badge b-fail">needs fix</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end #body -->
+</div><!-- end #app -->
+
+<!-- ── MODAL: NEW SUITE ───────────────── -->
+<div class="modal-overlay" id="suiteModal">
+  <div class="modal">
+    <div class="modal-title">Create New Test Suite</div>
+    <div class="form-field" style="margin-bottom:10px">
+      <label class="form-label">Suite Name</label>
+      <input class="form-input" id="newSuiteName" placeholder="e.g. Checkout E2E">
+    </div>
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label">Base URL</label>
+        <input class="form-input mono" id="newSuiteUrl" placeholder="https://example.com">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Browser</label>
+        <select class="form-select" id="newSuiteBrowser">
+          <option>chromium</option><option>firefox</option><option>webkit</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Description</label>
+      <textarea class="form-input" id="newSuiteDesc" placeholder="What does this suite test?"></textarea>
+    </div>
+    <div class="modal-acts">
+      <button class="btn btn-ghost" onclick="hideModal('suiteModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="createSuite()">Create Suite</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ───────────────────────────── -->
+<div class="toast" id="toast">
+  <div class="toast-icon" id="toastIcon">✅</div>
+  <div id="toastMsg">Action completed</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+const STATE = {
+  currentPage: 'dashboard',
+  currentSuite: 0,
+  selectedStep: null,
+  currentTab: 'manual',
+  inspectMode: true,
+  selectedElement: null,
+  browser: 'chromium',
+  runHistory: [],
+  totalHeals: 7,
+  isRunning: false,
+  runTimer: null,
+  logTimer: null,
+  envs: ['Staging', 'Production', 'Development'],
+  envIdx: 0,
+  dragSrc: null,
+  suites: [
+    {
+      id: 0,
+      name: 'Login Flow',
+      url: 'https://staging.example.com',
+      browser: 'chromium',
+      steps: [
+        {id:1, action:'navigate', desc:'Go to login page', value:'https://staging.example.com/login', selector:'', status:'pending'},
+        {id:2, action:'fill', desc:'Enter email', selector:'[data-testid="email-input"]', value:'admin@test.com', status:'pending'},
+        {id:3, action:'fill', desc:'Enter password', selector:'[data-testid="password-input"]', value:'secret123', status:'pending'},
+        {id:4, action:'click', desc:'Click Sign In button', selector:'[data-testid="login-btn"]', value:'', status:'pending'},
+        {id:5, action:'assert_text', desc:'Assert dashboard loaded', selector:'.welcome-msg', value:'Welcome', status:'pending'},
+        {id:6, action:'screenshot', desc:'Capture dashboard', selector:'', value:'dashboard', status:'pending'},
+      ]
+    },
+    {
+      id: 1,
+      name: 'Checkout E2E',
+      url: 'https://staging.example.com',
+      browser: 'chromium',
+      steps: [
+        {id:1, action:'navigate', desc:'Go to products page', value:'https://staging.example.com/products', selector:'', status:'pending'},
+        {id:2, action:'click', desc:'Click first product', selector:'.product-card:first-child', value:'', status:'pending'},
+        {id:3, action:'click', desc:'Add to cart', selector:'[data-testid="add-to-cart"]', value:'', status:'pending'},
+        {id:4, action:'assert_text', desc:'Assert cart count', selector:'.cart-badge', value:'1', status:'pending'},
+        {id:5, action:'click', desc:'Go to checkout', selector:'[data-testid="checkout-btn"]', value:'', status:'pending'},
+        {id:6, action:'fill', desc:'Enter card number', selector:'#card-number', value:'4111111111111111', status:'pending'},
+        {id:7, action:'fill', desc:'Enter expiry', selector:'#card-expiry', value:'12/26', status:'pending'},
+        {id:8, action:'click', desc:'Place order', selector:'[data-testid="place-order"]', value:'', status:'pending'},
+        {id:9, action:'assert_text', desc:'Assert confirmation', selector:'.order-confirmed', value:'Order Confirmed', status:'pending'},
+        {id:10, action:'screenshot', desc:'Capture confirmation', selector:'', value:'order-confirmed', status:'pending'},
+      ]
+    },
+    {
+      id: 2,
+      name: 'Search & Filter',
+      url: 'https://staging.example.com',
+      browser: 'firefox',
+      steps: [
+        {id:1, action:'navigate', desc:'Go to search page', value:'https://staging.example.com/search', selector:'', status:'pending'},
+        {id:2, action:'fill', desc:'Type search query', selector:'[data-testid="search-input"]', value:'laptop', status:'pending'},
+        {id:3, action:'click', desc:'Click search button', selector:'[data-testid="search-btn"]', value:'', status:'pending'},
+        {id:4, action:'assert_text', desc:'Results appear', selector:'.result-count', value:'results', status:'pending'},
+        {id:5, action:'click', desc:'Apply price filter', selector:'[data-testid="price-filter"]', value:'', status:'pending'},
+        {id:6, action:'screenshot', desc:'Capture filtered results', selector:'', value:'search-results', status:'pending'},
+      ]
+    }
+  ]
+};
+
+let stepIdCounter = 100;
+
+// ═══════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function switchPage(page) {
+  STATE.currentPage = page;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.sb-item[data-page]').forEach(s => s.classList.remove('active'));
+
+  const pg = document.getElementById('page-' + page);
+  if(pg) pg.classList.add('active');
+  document.querySelectorAll(`[data-page="${page}"]`).forEach(el => el.classList.add('active'));
+
+  if(page === 'builder') renderStepList();
+  if(page === 'dashboard') refreshDashboard();
+  if(page === 'reports') refreshReports();
+}
+
+document.querySelectorAll('.nav-tab').forEach(t => {
+  t.addEventListener('click', () => switchPage(t.dataset.page));
+});
+document.querySelectorAll('.sb-item[data-page]').forEach(t => {
+  t.addEventListener('click', () => switchPage(t.dataset.page));
+});
+
+// Editor tabs
+document.querySelectorAll('.editor-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.editor-tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    STATE.currentTab = t.dataset.tab;
+    if(STATE.selectedStep !== null) renderEditor();
+    else {
+      if(STATE.currentTab === 'ai') showAiTab();
+      else if(STATE.currentTab === 'script') showScriptTab();
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+//  SUITE / STEP MANAGEMENT
+// ═══════════════════════════════════════════════════════════
+function loadSuite(idx) {
+  STATE.currentSuite = parseInt(idx);
+  STATE.selectedStep = null;
+  const suite = STATE.suites[STATE.currentSuite];
+  document.getElementById('builderSuiteName').textContent = suite.name;
+  document.getElementById('builderSub').textContent = `${suite.steps.length} steps · ${suite.browser} · ${STATE.envs[STATE.envIdx]}`;
+  renderStepList();
+  document.getElementById('editorBody').innerHTML = '<div class="empty"><div class="empty-icon">👈</div>Select a step to edit</div>';
+}
+
+function renderStepList() {
+  const suite = STATE.suites[STATE.currentSuite];
+  const list = document.getElementById('stepList');
+  document.getElementById('stepCount').textContent = suite.steps.length + ' steps';
+  document.getElementById('builderSub').textContent = `${suite.steps.length} steps · ${suite.browser} · ${STATE.envs[STATE.envIdx]}`;
+
+  if(!suite.steps.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📝</div>No steps yet. Add steps below.</div>';
+    return;
+  }
+
+  list.innerHTML = suite.steps.map((step, i) => `
+    <div class="step-card ${STATE.selectedStep === i ? 'selected' : ''}"
+         data-idx="${i}" draggable="true"
+         onclick="selectStep(${i})"
+         ondragstart="dragStart(event,${i})"
+         ondragover="dragOver(event,${i})"
+         ondrop="dragDrop(event,${i})"
+         ondragend="dragEnd(event)">
+      <div class="step-num">${i+1}</div>
+      <span class="step-tag ${tagClass(step.action)}">${tagLabel(step.action)}</span>
+      <span class="step-desc">${step.desc || step.value || step.selector || 'Empty step'}</span>
+      <div class="step-status" style="background:${statusColor(step.status)}"></div>
+      <div class="step-acts">
+        <div class="sact" onclick="event.stopPropagation();dupeStep(${i})" title="Duplicate">⧉</div>
+        <div class="sact del" onclick="event.stopPropagation();deleteStep(${i})" title="Delete">✕</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function tagClass(action) {
+  const map = {navigate:'tag-nav',click:'tag-click',fill:'tag-fill',assert_text:'tag-assert',wait:'tag-wait',screenshot:'tag-shot',js:'tag-js',select:'tag-select'};
+  return map[action] || 'tag-wait';
+}
+function tagLabel(action) {
+  const map = {navigate:'NAV',click:'CLICK',fill:'FILL',assert_text:'ASSERT',wait:'WAIT',screenshot:'SHOT',js:'JS',select:'SELECT'};
+  return map[action] || action.toUpperCase().slice(0,5);
+}
+function statusColor(s) {
+  return s==='pass'?'var(--green)':s==='fail'?'var(--red)':'var(--t3)';
+}
+
+function selectStep(idx) {
+  STATE.selectedStep = idx;
+  renderStepList();
+  renderEditor();
+}
+
+function addStep(action) {
+  const suite = STATE.suites[STATE.currentSuite];
+  const defaults = {
+    navigate:{desc:'Navigate to URL', value:'https://', selector:''},
+    click:{desc:'Click element', selector:'', value:''},
+    fill:{desc:'Fill input', selector:'', value:''},
+    assert_text:{desc:'Assert text', selector:'', value:''},
+    wait:{desc:'Wait for element', selector:'', value:'3000'},
+    screenshot:{desc:'Take screenshot', selector:'', value:'screenshot'},
+    js:{desc:'Execute JavaScript', selector:'', value:'console.log("step")'},
+    select:{desc:'Select dropdown', selector:'', value:''},
+  };
+  const d = defaults[action] || {desc:'New step', selector:'', value:''};
+  suite.steps.push({id:++stepIdCounter, action, ...d, status:'pending'});
+  STATE.selectedStep = suite.steps.length - 1;
+  renderStepList();
+  renderEditor();
+  toast('Step added', '✅');
+}
+
+function deleteStep(idx) {
+  const suite = STATE.suites[STATE.currentSuite];
+  suite.steps.splice(idx, 1);
+  if(STATE.selectedStep >= suite.steps.length) STATE.selectedStep = suite.steps.length - 1;
+  if(suite.steps.length === 0) STATE.selectedStep = null;
+  renderStepList();
+  if(STATE.selectedStep !== null) renderEditor();
+  else document.getElementById('editorBody').innerHTML = '<div class="empty"><div class="empty-icon">👈</div>Select a step to edit</div>';
+  toast('Step deleted', '🗑');
+}
+
+function dupeStep(idx) {
+  const suite = STATE.suites[STATE.currentSuite];
+  const copy = {...suite.steps[idx], id:++stepIdCounter};
+  suite.steps.splice(idx+1,0,copy);
+  STATE.selectedStep = idx+1;
+  renderStepList();
+  renderEditor();
+  toast('Step duplicated', '⧉');
+}
+
+function saveSuite() { toast('Suite saved', '💾'); }
+
+// ── Drag & Drop ──
+function dragStart(e, idx) { STATE.dragSrc = idx; e.currentTarget.classList.add('dragging'); }
+function dragOver(e, idx) {
+  e.preventDefault();
+  document.querySelectorAll('.step-card').forEach(c => c.classList.remove('drag-over'));
+  if(idx !== STATE.dragSrc) e.currentTarget.classList.add('drag-over');
+}
+function dragDrop(e, idx) {
+  e.preventDefault();
+  if(STATE.dragSrc === null || STATE.dragSrc === idx) return;
+  const suite = STATE.suites[STATE.currentSuite];
+  const [moved] = suite.steps.splice(STATE.dragSrc, 1);
+  suite.steps.splice(idx, 0, moved);
+  STATE.selectedStep = idx;
+  renderStepList();
+}
+function dragEnd(e) {
+  STATE.dragSrc = null;
+  document.querySelectorAll('.step-card').forEach(c => { c.classList.remove('dragging'); c.classList.remove('drag-over'); });
+}
+
+// ── Editor ──
+function renderEditor() {
+  if(STATE.selectedStep === null) return;
+  if(STATE.currentTab === 'manual') renderManualEditor();
+  else if(STATE.currentTab === 'script') showScriptTab();
+  else showAiTab();
+}
+
+function renderManualEditor() {
+  const suite = STATE.suites[STATE.currentSuite];
+  const step = suite.steps[STATE.selectedStep];
+  if(!step) return;
+
+  const needsSelector = !['navigate','screenshot','js'].includes(step.action);
+  const needsValue = step.action !== 'click';
+
+  document.getElementById('editorBody').innerHTML = `
+    <div class="sec-title">Step ${STATE.selectedStep+1} — ${tagLabel(step.action)}</div>
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label">Action</label>
+        <select class="form-select" id="stepAction" onchange="updateStepAction()">
+          ${['navigate','click','fill','assert_text','wait','screenshot','js','select'].map(a=>`<option value="${a}" ${a===step.action?'selected':''}>${tagLabel(a)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Description</label>
+        <input class="form-input" id="stepDesc" value="${escHtml(step.desc)}" placeholder="Step description" oninput="updateStep('desc',this.value)">
+      </div>
+    </div>
+    ${needsSelector ? `
+    <div class="form-field" style="margin-bottom:10px">
+      <label class="form-label">Target Selector</label>
+      <div style="display:flex;gap:6px">
+        <input class="form-input mono" style="flex:1" id="stepSelector" value="${escHtml(step.selector)}" placeholder='[data-testid="btn"]' oninput="updateStep('selector',this.value)">
+        <button class="btn btn-ghost btn-sm" onclick="switchPage('inspector')">🔍 Pick</button>
+      </div>
+    </div>` : ''}
+    ${needsValue ? `
+    <div class="form-field" style="margin-bottom:10px">
+      <label class="form-label">${step.action==='navigate'?'URL':step.action==='assert_text'?'Expected Text':step.action==='wait'?'Timeout (ms)':step.action==='js'?'JavaScript':'Value'}</label>
+      <input class="form-input mono" id="stepValue" value="${escHtml(step.value)}" placeholder="${step.action==='navigate'?'https://':'value...'}" oninput="updateStep('value',this.value)">
+    </div>` : ''}
+
+    ${needsSelector ? `
+    <div class="sec-title">Locator Fingerprint</div>
+    <div class="heal-box">
+      <div class="heal-num">94</div>
+      <div><div style="font-weight:700;color:var(--green);font-size:12px">Healing Score</div><div style="font-size:11px;color:var(--t2)">4 locators · excellent resilience</div></div>
+    </div>
+    <div class="locator-row"><div class="loc-type">data-testid</div><div class="loc-val">${step.selector || '[data-testid="element"]'}</div><div class="loc-badge" style="color:var(--cyan)">★ Primary</div></div>
+    <div class="locator-row"><div class="loc-type">ARIA</div><div class="loc-val">role=button[accessible name]</div><div class="loc-badge" style="color:var(--green)">Fallback 1</div></div>
+    <div class="locator-row"><div class="loc-type">CSS</div><div class="loc-val">.parent-class > .element</div><div class="loc-badge" style="color:var(--t2)">Fallback 2</div></div>
+    <div class="locator-row"><div class="loc-type">XPath</div><div class="loc-val">//element[text()="label"]</div><div class="loc-badge" style="color:var(--t2)">Fallback 3</div></div>
+    ` : ''}
+
+    <div class="sec-title">Options</div>
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-label">Timeout (ms)</label>
+        <input class="form-input mono" value="30000">
+      </div>
+      <div class="form-field">
+        <label class="form-label">On Failure</label>
+        <select class="form-select"><option>Stop Suite</option><option>Continue</option><option>Retry (3x)</option></select>
+      </div>
+    </div>
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);cursor:pointer;margin-bottom:6px">
+      <input type="checkbox" style="accent-color:var(--cyan)"> Take screenshot after this step
+    </label>
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);cursor:pointer">
+      <input type="checkbox" checked style="accent-color:var(--cyan)"> Enable self-healing
+    </label>
+  `;
+}
+
+function showScriptTab() {
+  const suite = STATE.suites[STATE.currentSuite];
+  const code = generateScript(suite);
+  document.getElementById('editorBody').innerHTML = `
+    <div class="sec-title">Generated Playwright Script</div>
+    <div style="background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:12px;font-family:var(--font-mono);font-size:11px;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--t2);">${syntaxHL(code)}</div>
+    <div style="display:flex;gap:6px;margin-top:10px">
+      <button class="btn btn-ghost btn-sm" onclick="copyCode()">📋 Copy Code</button>
+      <button class="btn btn-ghost btn-sm" onclick="downloadCode()">💾 Download</button>
+    </div>
+  `;
+}
+
+function showAiTab() {
+  const suite = STATE.suites[STATE.currentSuite];
+  document.getElementById('editorBody').innerHTML = `
+    <div class="sec-title">✨ AI Suggestions for ${escHtml(suite.name)}</div>
+    <div class="ai-box">
+      <div class="ai-label">✨ Missing Assertion Detected</div>
+      <div class="ai-text">After the login click (Step 4), consider adding an assertion to verify the URL changed to <code>/dashboard</code> or that a welcome message is visible. This prevents false positives.</div>
+    </div>
+    <div class="ai-box">
+      <div class="ai-label">⚡ Locator Risk</div>
+      <div class="ai-text">Step 2 uses a CSS class selector. Classes change frequently during UI refactors. Consider switching to <code>[data-testid="email-input"]</code> for better stability.</div>
+    </div>
+    <div class="ai-box">
+      <div class="ai-label">📸 Screenshot Opportunity</div>
+      <div class="ai-text">No screenshot is taken after the final assertion. Add a screenshot step to capture evidence of successful login for audit and debugging purposes.</div>
+    </div>
+    <div class="ai-box" style="border-color:rgba(0,229,160,.2);background:var(--green-dim)">
+      <div class="ai-label" style="color:var(--green)">✅ Good Practices Found</div>
+      <div class="ai-text">Suite has a logical flow: navigate → authenticate → assert. This is well-structured. Password is masked with <code>••••</code> syntax.</div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:8px" onclick="applyAiSuggestion()">✨ Apply All Suggestions</button>
+  `;
+}
+
+function generateScript(suite) {
+  const lines = [`import { test, expect } from '@playwright/test';`, ``, `test('${suite.name}', async ({ page }) => {`];
+  suite.steps.forEach(step => {
+    switch(step.action) {
+      case 'navigate': lines.push(`  await page.goto('${step.value}');`); break;
+      case 'click':    lines.push(`  await page.click('${step.selector}');`); break;
+      case 'fill':     lines.push(`  await page.fill('${step.selector}', '${step.value}');`); break;
+      case 'assert_text': lines.push(`  await expect(page.locator('${step.selector}')).toContainText('${step.value}');`); break;
+      case 'wait':     lines.push(`  await page.waitForSelector('${step.selector}', { timeout: ${step.value||30000} });`); break;
+      case 'screenshot': lines.push(`  await page.screenshot({ path: 'screenshots/${step.value}.png', fullPage: true });`); break;
+      case 'js':       lines.push(`  await page.evaluate(() => { ${step.value} });`); break;
+      case 'select':   lines.push(`  await page.selectOption('${step.selector}', '${step.value}');`); break;
+    }
+  });
+  lines.push(`});`);
+  return lines.join('\n');
+}
+
+function syntaxHL(code) {
+  return escHtml(code)
+    .replace(/(import|from|const|await|async|test|expect)/g, '<span style="color:var(--purple)">$1</span>')
+    .replace(/('.*?')/g, '<span style="color:var(--green)">$1</span>')
+    .replace(/(\/\/.*)/g, '<span style="color:var(--t3)">$1</span>')
+    .replace(/(\bpage\b)/g, '<span style="color:var(--cyan)">$1</span>');
+}
+
+function updateStep(field, val) {
+  if(STATE.selectedStep === null) return;
+  STATE.suites[STATE.currentSuite].steps[STATE.selectedStep][field] = val;
+  renderStepList();
+}
+function updateStepAction() {
+  const newAction = document.getElementById('stepAction').value;
+  if(STATE.selectedStep === null) return;
+  STATE.suites[STATE.currentSuite].steps[STATE.selectedStep].action = newAction;
+  renderStepList();
+  renderEditor();
+}
+function applyAiSuggestion() {
+  const suite = STATE.suites[STATE.currentSuite];
+  suite.steps.push({id:++stepIdCounter, action:'assert_text', desc:'Assert URL is /dashboard', selector:'.page-url', value:'dashboard', status:'pending'});
+  suite.steps.push({id:++stepIdCounter, action:'screenshot', desc:'Capture success state', selector:'', value:'final-state', status:'pending'});
+  toast('AI suggestions applied!', '✨');
+  loadSuite(STATE.currentSuite);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RUNNER ENGINE
+// ═══════════════════════════════════════════════════════════
+let runStartTime = 0;
+let logCount = 0;
+
+function startRun() {
+  const suiteIdx = parseInt(document.getElementById('runSuiteSelect')?.value ?? STATE.currentSuite);
+  STATE.currentSuite = suiteIdx;
+  switchPage('runner');
+  setTimeout(() => executeRun(suiteIdx), 100);
+}
+
+function runCurrentSuite() {
+  switchPage('runner');
+  setTimeout(() => executeRun(STATE.currentSuite), 100);
+}
+
+async function executeRun(suiteIdx) {
+  if(STATE.isRunning) return;
+  STATE.isRunning = true;
+
+  const suite = STATE.suites[suiteIdx];
+  const speed = parseInt(document.getElementById('speedSelect')?.value ?? 300);
+  const browser = STATE.browser;
+
+  // Reset step statuses
+  suite.steps.forEach(s => s.status = 'pending');
+  if(STATE.currentPage === 'builder') renderStepList();
+
+  // UI setup
+  const logStream = document.getElementById('logStream');
+  logStream.innerHTML = '';
+  logCount = 0;
+  document.getElementById('lfPass').textContent = '0';
+  document.getElementById('lfFail').textContent = '0';
+  document.getElementById('lfHeal').textContent = '0';
+  document.getElementById('lfTime').textContent = '0.0s';
+  document.getElementById('stopBtn').disabled = false;
+  document.getElementById('runPulse').className = 'pulse';
+  document.getElementById('logPulse').className = 'pulse';
+  document.getElementById('wsStatus').textContent = '● connected';
+  document.getElementById('runStatusText').textContent = `Running ${suite.name}`;
+  document.getElementById('runnerSub').textContent = `${suite.name} · ${browser} · ${STATE.envs[STATE.envIdx]}`;
+
+  let passCount = 0, failCount = 0, healCount = 0;
+  runStartTime = Date.now();
+  STATE.runTimer = setInterval(() => {
+    const elapsed = ((Date.now()-runStartTime)/1000).toFixed(1);
+    document.getElementById('lfTime').textContent = elapsed + 's';
+  }, 100);
+
+  // Render step progress
+  renderStepProgress(suite, -1);
+
+  addLog('INFO', `Browser: ${browser.toUpperCase()} · Mode: ${document.getElementById('headlessCheck')?.checked ? 'headless' : 'headed'}`);
+  addLog('INFO', `Suite: ${suite.name} · ${suite.steps.length} steps`);
+  addLog('INFO', `Environment: ${STATE.envs[STATE.envIdx]}`);
+  await delay(speed || 200);
+
+  // Step execution loop
+  for(let i = 0; i < suite.steps.length; i++) {
+    if(!STATE.isRunning) break;
+    const step = suite.steps[i];
+    renderStepProgress(suite, i);
+    updateBrowserPreview(step, 'running');
+
+    addLog('STEP', `→ [${i+1}/${suite.steps.length}] ${tagLabel(step.action)}: ${step.desc}`);
+    await delay(speed + Math.random()*200);
+
+    // Simulate realistic outcomes
+    const healChance = step.selector && step.selector.includes('.') ? 0.15 : 0.03;
+    const failChance = suiteIdx === 1 && i === 8 ? 0.7 : 0.05; // Checkout step 9 often fails
+    const rand = Math.random();
+
+    if(rand < healChance && step.selector) {
+      healCount++;
+      STATE.totalHeals++;
+      const newSel = step.selector.replace(/\./g, '[data-testid="').replace(/$/,  '"]');
+      addLog('HEAL', `⚡ Primary locator failed — trying ARIA fallback`);
+      await delay(speed * 0.5);
+      addLog('HEAL', `✔ Healed: ${step.selector} → role=button[name]`);
+      document.getElementById('lfHeal').textContent = healCount;
+      document.getElementById('sbHealCount').textContent = STATE.totalHeals;
+      step.status = 'pass';
+      passCount++;
+    } else if(rand < failChance + healChance) {
+      step.status = 'fail';
+      failCount++;
+      addLog('FAIL', `✗ Step ${i+1} FAILED: Element not found or assertion mismatch`);
+      addLog('FAIL', `  Selector: ${step.selector || 'N/A'}`);
+      renderStepProgress(suite, i, 'fail');
+      updateBrowserPreview(step, 'fail');
+      if(STATE.isRunning) {
+        addLog('INFO', `Suite stopped on failure at step ${i+1}`);
+        break;
+      }
+    } else {
+      step.status = 'pass';
+      passCount++;
+      const dur = (80 + Math.random()*600).toFixed(0);
+      addLog('PASS', `✓ Step ${i+1} passed — ${dur}ms`);
+    }
+
+    document.getElementById('lfPass').textContent = passCount;
+    document.getElementById('lfFail').textContent = failCount;
+    renderStepProgress(suite, i);
+    if(STATE.currentPage === 'builder') renderStepList();
+    await delay(speed * 0.3);
+  }
+
+  // Finish
+  const totalTime = ((Date.now()-runStartTime)/1000).toFixed(1);
+  clearInterval(STATE.runTimer);
+
+  const runRecord = {
+    id: STATE.runHistory.length + 1,
+    suite: suite.name,
+    status: failCount === 0 ? 'pass' : 'fail',
+    passed: passCount,
+    failed: failCount,
+    healed: healCount,
+    duration: totalTime,
+    browser,
+    timestamp: new Date()
+  };
+  STATE.runHistory.push(runRecord);
+
+  addLog('INFO', `─────────────────────────`);
+  addLog(failCount ? 'FAIL' : 'PASS',
+    failCount ? `Suite FAILED · ${passCount} passed, ${failCount} failed · ${totalTime}s`
+              : `Suite PASSED · All ${passCount} steps passed · ${totalTime}s`);
+
+  document.getElementById('runPulse').className = failCount ? 'pulse red' : 'pulse off';
+  document.getElementById('logPulse').className = 'pulse off';
+  document.getElementById('runStatusText').textContent = failCount ? 'Failed' : 'Passed';
+  document.getElementById('stopBtn').disabled = true;
+  document.getElementById('wsStatus').textContent = '● disconnected';
+
+  STATE.isRunning = false;
+
+  // Update dashboard
+  addActivity(runRecord);
+  refreshDashboard();
+  document.getElementById('sbRunCount').textContent = STATE.runHistory.length;
+
+  toast(failCount ? `Run failed: ${failCount} step(s) failed` : `Run passed: All ${passCount} steps!`, failCount ? '❌' : '✅');
+}
+
+function stopRun() {
+  STATE.isRunning = false;
+  clearInterval(STATE.runTimer);
+  addLog('WARN', '⏹ Run stopped by user');
+  document.getElementById('stopBtn').disabled = true;
+  document.getElementById('runPulse').className = 'pulse off';
+  document.getElementById('runStatusText').textContent = 'Stopped';
+  toast('Run stopped', '⏹');
+}
+
+function addLog(type, msg) {
+  const stream = document.getElementById('logStream');
+  const now = new Date();
+  const t = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  const typeMap = {PASS:'pass',FAIL:'fail',INFO:'info',WARN:'warn',HEAL:'heal',STEP:'step'};
+  const cls = typeMap[type] || 'info';
+  const isCurrent = type === 'STEP';
+  const isErr = type === 'FAIL';
+
+  // Remove 'current' from previous
+  document.querySelectorAll('.log-entry.current').forEach(e => e.classList.remove('current'));
+
+  const div = document.createElement('div');
+  div.className = `log-entry${isCurrent?' current':''}${isErr?' err':''}`;
+  div.innerHTML = `<span class="log-t">${t}</span><span class="log-k ${cls}">${type}</span><span class="log-msg">${escHtml(msg)}</span>`;
+  div.style.opacity = '0';
+  div.style.transform = 'translateX(-4px)';
+  div.style.transition = 'all .2s';
+  stream.appendChild(div);
+  requestAnimationFrame(() => { div.style.opacity='1'; div.style.transform='translateX(0)'; });
+  stream.scrollTop = stream.scrollHeight;
+  logCount++;
+}
+
+function clearLog() {
+  document.getElementById('logStream').innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;color:var(--t3);"><div style="font-size:28px;opacity:.3">▶</div><div style="font-size:11px">Log cleared — run a suite to see output</div></div>';
+}
+
+function renderStepProgress(suite, currentIdx, forceStatus) {
+  const list = document.getElementById('stepProgList');
+  list.innerHTML = suite.steps.map((step, i) => {
+    let cls = 'pending', icon = '○';
+    if(i < currentIdx || (i === currentIdx && step.status === 'pass')) { cls='done'; icon='✅'; }
+    else if(i === currentIdx && step.status === 'fail') { cls='fail'; icon='❌'; }
+    else if(i === currentIdx) { cls='current'; icon='⏳'; }
+    const dur = step.status === 'pass' ? `${(80+Math.random()*500).toFixed(0)}ms` : step.status === 'fail' ? 'failed' : '—';
+    return `<div class="sp-item ${cls}">
+      <span class="sp-icon">${icon}</span>
+      <span class="sp-txt">[${i+1}] ${escHtml(step.desc || step.action)}</span>
+      <span class="sp-dur">${dur}</span>
+    </div>`;
+  }).join('');
+}
+
+function updateBrowserPreview(step, state) {
+  const content = document.getElementById('bmockContent');
+  if(!content) return;
+  const urlBar = document.getElementById('bmockUrl');
+
+  if(step.action === 'navigate' && step.value) {
+    const url = step.value.replace('https://','').replace('staging.example.com','example.com');
+    urlBar.title = step.value;
+  }
+
+  if(step.action === 'fill') {
+    content.innerHTML = `<div class="bmock-form">
+      <div class="bmock-row" style="width:60%;height:7px;background:var(--bg4)"></div>
+      <div class="bmock-inp" style="border-color:var(--cyan)"></div>
+      <div class="bmock-inp"></div>
+      <div class="bmock-btn"></div>
+    </div>`;
+  } else if(step.action === 'click') {
+    content.innerHTML = `<div style="display:flex;flex-direction:column;gap:3px;padding:2px">
+      <div class="bmock-row"></div>
+      <div class="bmock-hl">▶ Click target</div>
+      <div class="bmock-row" style="width:70%"></div>
+    </div>`;
+  } else if(step.action === 'assert_text') {
+    content.innerHTML = `<div style="display:flex;flex-direction:column;gap:3px;padding:2px">
+      <div class="bmock-row" style="width:80%"></div>
+      <div style="border:1px solid var(--green);border-radius:2px;padding:2px 4px;font-size:7px;color:var(--green);font-family:var(--font-mono)">✓ "${escHtml(step.value)}"</div>
+      <div class="bmock-row" style="width:60%"></div>
+    </div>`;
+  } else if(step.action === 'screenshot') {
+    content.innerHTML = `<div style="display:flex;flex-direction:column;gap:3px;padding:2px">
+      <div class="bmock-row"></div><div class="bmock-row" style="width:80%"></div>
+      <div style="border:1px solid var(--cyan);border-radius:2px;padding:2px 4px;font-size:7px;color:var(--cyan);text-align:center">📷 Captured</div>
+    </div>`;
+  } else if(state === 'fail') {
+    content.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--red);font-size:10px;flex-direction:column;gap:4px"><div>❌</div><div>Step failed</div></div>`;
+  } else {
+    content.innerHTML = `<div style="display:flex;flex-direction:column;gap:3px;padding:2px">
+      <div class="bmock-row"></div><div class="bmock-row" style="width:70%"></div><div class="bmock-row" style="width:50%"></div>
+    </div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INSPECTOR
+// ═══════════════════════════════════════════════════════════
+const ELEMENTS = {
+  simEmail: { name:'Email Input', tag:'input', id:'', testid:'email-input', cls:'form-input', type:'email', ariaLabel:'Email Address', placeholder:'user@example.com', visible:true, enabled:true },
+  simPass:  { name:'Password Input', tag:'input', id:'', testid:'password-input', cls:'form-input', type:'password', ariaLabel:'Password', placeholder:'••••••••', visible:true, enabled:true },
+  simLoginBtn: { name:'Login Button', tag:'button', id:'login-btn', testid:'login-btn', cls:'sim-btn', type:'submit', ariaLabel:'Sign In', innerText:'Sign In', visible:true, enabled:true }
+};
+
+function toggleInspect() {
+  STATE.inspectMode = !STATE.inspectMode;
+  document.getElementById('inspectToggle').textContent = `🔍 Inspect: ${STATE.inspectMode ? 'ON' : 'OFF'}`;
+  document.getElementById('inspectToggle').className = `btn btn-sm ${STATE.inspectMode ? 'btn-primary' : 'btn-ghost'}`;
+  if(!STATE.inspectMode) {
+    document.getElementById('hlOverlay').style.display = 'none';
+    document.getElementById('hlTooltip').style.display = 'none';
+  }
+}
+
+function setupInspector() {
+  Object.keys(ELEMENTS).forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('mouseenter', (e) => {
+      if(!STATE.inspectMode) return;
+      highlightElement(el, id);
+    });
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      if(!STATE.inspectMode) return;
+      selectElement(id);
+    });
+  });
+
+  document.getElementById('browserVp')?.addEventListener('mouseleave', () => {
+    if(!STATE.selectedElement) {
+      document.getElementById('hlOverlay').style.display = 'none';
+      document.getElementById('hlTooltip').style.display = 'none';
+    }
+  });
+}
+
+function highlightElement(el, id) {
+  const vp = document.getElementById('browserVp');
+  const vpRect = vp.getBoundingClientRect();
+  const elRect = el.getBoundingClientRect();
+  const overlay = document.getElementById('hlOverlay');
+  const tooltip = document.getElementById('hlTooltip');
+  const data = ELEMENTS[id];
+
+  overlay.style.display = 'block';
+  overlay.style.left = (elRect.left - vpRect.left - 2) + 'px';
+  overlay.style.top = (elRect.top - vpRect.top - 2) + 'px';
+  overlay.style.width = (elRect.width + 4) + 'px';
+  overlay.style.height = (elRect.height + 4) + 'px';
+
+  tooltip.style.display = 'block';
+  const sel = data.testid ? `[data-testid="${data.testid}"]` : `#${data.id||data.cls}`;
+  tooltip.textContent = sel;
+  tooltip.style.left = (elRect.left - vpRect.left) + 'px';
+  tooltip.style.top = (elRect.top - vpRect.top - 26) + 'px';
+}
+
+function selectElement(id) {
+  STATE.selectedElement = id;
+  const data = ELEMENTS[id];
+  document.getElementById('capturedName').textContent = data.name;
+
+  const attrs = [
+    ['tagName', data.tag],
+    ['id', data.id || '(none)'],
+    ['data-testid', data.testid || '(none)'],
+    ['class', data.cls || '(none)'],
+    ['type', data.type || '(none)'],
+    ['aria-label', data.ariaLabel || '(none)'],
+    ['placeholder', data.placeholder || '(none)'],
+    ['visible', data.visible ? 'true' : 'false'],
+    ['enabled', data.enabled ? 'true' : 'false'],
+  ];
+
+  document.getElementById('attrList').innerHTML = attrs.map(([k,v]) =>
+    `<div class="attr-row"><span class="attr-k">${k}</span><span class="attr-v ${(v==='true')?'green':''}">${escHtml(v)}</span></div>`
+  ).join('');
+
+  const sel1 = data.testid ? `[data-testid="${data.testid}"]` : null;
+  const sel2 = data.ariaLabel ? `[aria-label="${data.ariaLabel}"]` : null;
+  const sel3 = data.cls ? `.${data.cls.split(' ')[0]}` : null;
+  const sel4 = data.id ? `#${data.id}` : null;
+  const sel5 = `//${data.tag}[@placeholder="${data.placeholder||data.innerText||''}"]`;
+
+  const score = sel1 ? 97 : sel2 ? 80 : 65;
+
+  document.getElementById('locatorList').innerHTML = `
+    <div class="heal-box">
+      <div class="heal-num">${score}</div>
+      <div><div style="font-weight:700;color:var(--green);font-size:12px">Stability Score</div><div style="font-size:11px;color:var(--t2)">${[sel1,sel2,sel3,sel4].filter(Boolean).length} locators · ${score>90?'excellent':score>75?'good':'fair'}</div></div>
+    </div>
+    ${sel1?`<div class="locator-row"><div class="loc-type">data-testid</div><div class="loc-val">${escHtml(sel1)}</div><div class="loc-badge" style="color:var(--cyan)">★ Primary</div></div>`:''}
+    ${sel2?`<div class="locator-row"><div class="loc-type">ARIA</div><div class="loc-val">${escHtml(sel2)}</div><div class="loc-badge" style="color:var(--green)">Fallback 1</div></div>`:''}
+    ${sel3?`<div class="locator-row"><div class="loc-type">CSS</div><div class="loc-val">${escHtml(sel3)}</div><div class="loc-badge" style="color:var(--t2)">Fallback 2</div></div>`:''}
+    ${sel4?`<div class="locator-row"><div class="loc-type">ID</div><div class="loc-val">${escHtml(sel4)}</div><div class="loc-badge" style="color:var(--t2)">Fallback 3</div></div>`:''}
+    <div class="locator-row"><div class="loc-type">XPath</div><div class="loc-val">${escHtml(sel5)}</div><div class="loc-badge" style="color:var(--t2)">Fallback 4</div></div>
+  `;
+
+  document.getElementById('aiInsight').innerHTML = `
+    <div class="ai-box">
+      <div class="ai-label">✨ AI Insight</div>
+      <div class="ai-text">${
+        data.testid
+          ? `Strong <code>data-testid="${data.testid}"</code> found — recommended as primary locator. This is highly stable across refactors.`
+          : `No data-testid found. Consider asking your dev team to add <code>data-testid="${data.tag}-element"</code> to this element for maximum stability.`
+      }</div>
+    </div>
+  `;
+
+  document.getElementById('inspActBtns').style.display = 'block';
+  highlightElement(document.getElementById(id), id);
+}
+
+function addToTest() {
+  if(!STATE.selectedElement) return;
+  const data = ELEMENTS[STATE.selectedElement];
+  const sel = data.testid ? `[data-testid="${data.testid}"]` : `[aria-label="${data.ariaLabel}"]`;
+  const suite = STATE.suites[STATE.currentSuite];
+  suite.steps.push({id:++stepIdCounter, action:'click', desc:`Click ${data.name}`, selector:sel, value:'', status:'pending'});
+  toast(`Added "${data.name}" to ${suite.name}`, '✅');
+}
+
+function copySelector() {
+  if(!STATE.selectedElement) { toast('No element selected','⚠️'); return; }
+  const data = ELEMENTS[STATE.selectedElement];
+  const sel = data.testid ? `[data-testid="${data.testid}"]` : `[aria-label="${data.ariaLabel}"]`;
+  navigator.clipboard?.writeText(sel).catch(()=>{});
+  toast('Selector copied to clipboard', '📋');
+}
+
+function saveElement() {
+  if(!STATE.selectedElement) { toast('No element selected','⚠️'); return; }
+  toast('Element saved to repository', '💾');
+}
+
+function reloadSim() { toast('Simulated browser reloaded', '↻'); }
+
+// ═══════════════════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════════════════
+function refreshDashboard() {
+  const runs = STATE.runHistory;
+  const total = runs.length;
+  const passed = runs.filter(r => r.status === 'pass').length;
+  const failed = runs.filter(r => r.status === 'fail').length;
+  const passRate = total ? Math.round((passed/total)*100) : null;
+  const avgDur = total ? (runs.reduce((s,r) => s + parseFloat(r.duration), 0) / total).toFixed(1) + 's' : '—';
+
+  document.getElementById('statRuns').textContent = total;
+  document.getElementById('statPass').textContent = passRate !== null ? passRate + '%' : '—';
+  document.getElementById('statPassLbl').textContent = total ? `${passed} / ${total} runs` : 'No runs yet';
+  document.getElementById('statDur').textContent = avgDur;
+  document.getElementById('statHeal').textContent = STATE.totalHeals;
+
+  if(total > 0) {
+    document.getElementById('statPassChip').style.display = 'inline-block';
+    document.getElementById('statPassChip').textContent = passRate >= 80 ? `↑ ${passRate}% pass rate` : `↓ ${100-passRate}% fail rate`;
+    document.getElementById('statPassChip').className = `stat-chip ${passRate >= 80 ? 'chip-up' : 'chip-dn'}`;
+  }
+
+  // Sparkline
+  const spark = document.getElementById('sparkRuns');
+  spark.innerHTML = runs.slice(-7).map(r =>
+    `<div class="spark-bar" style="background:${r.status==='pass'?'var(--green)':'var(--red)'};height:${40+Math.random()*60}%"></div>`
+  ).join('');
+
+  // Recent runs table
+  if(runs.length) {
+    document.getElementById('recentRunsTable').innerHTML = runs.slice(-5).reverse().map(r => `
+      <tr>
+        <td><strong style="color:var(--t1)">${escHtml(r.suite)}</strong></td>
+        <td><span class="badge ${r.status==='pass'?'b-pass':'b-fail'}">${r.status}</span></td>
+        <td>${r.browser}</td>
+        <td>${r.duration}s</td>
+        <td>${timeAgo(r.timestamp)}</td>
+      </tr>
+    `).join('');
+  }
+
+  // Suite health
+  const healthEl = document.getElementById('suiteHealth');
+  healthEl.innerHTML = STATE.suites.map(suite => {
+    const suiteRuns = STATE.runHistory.filter(r => r.suite === suite.name);
+    const pct = suiteRuns.length ? Math.round((suiteRuns.filter(r=>r.status==='pass').length/suiteRuns.length)*100) : null;
+    const pctLabel = pct !== null ? pct + '%' : '—';
+    const cls = pct === null ? '' : pct >= 90 ? 'b-pass' : pct >= 70 ? 'b-skip' : 'b-fail';
+    const barCls = pct === null ? '' : pct >= 90 ? '' : pct >= 70 ? 'orange' : 'red';
+    const label = pct === null ? 'no runs' : pct >= 90 ? 'stable' : pct >= 70 ? 'flaky' : 'failing';
+    return `<div class="health-row">
+      <div class="health-name">${escHtml(suite.name)}</div>
+      <div style="flex:1"><div class="pbar"><div class="pbar-fill ${barCls}" style="width:${pct||0}%"></div></div></div>
+      <div class="health-pct" style="color:${pct===null?'var(--t3)':pct>=90?'var(--green)':pct>=70?'var(--yellow)':'var(--red)'}">${pctLabel}</div>
+      <span class="badge ${cls}">${label}</span>
+    </div>`;
+  }).join('');
+
+  // Update sub
+  if(runs.length) {
+    document.getElementById('dashSub').textContent = `E-Commerce Platform · Last run: ${timeAgo(runs[runs.length-1].timestamp)}`;
+  }
+}
+
+function addActivity(run) {
+  const feed = document.getElementById('activityFeed');
+  const item = document.createElement('div');
+  item.className = 'activity-item';
+  item.innerHTML = `
+    <div class="act-dot" style="background:${run.status==='pass'?'var(--green)':'var(--red)'}"></div>
+    <div>
+      <div>${run.status==='pass'?'✓':'✗'} <strong style="color:var(--t1)">${escHtml(run.suite)}</strong> ${run.status==='pass'?`passed all ${run.passed} steps`:`failed at step`}</div>
+      <div class="act-time">just now</div>
+    </div>
+  `;
+  item.style.opacity = '0';
+  feed.insertBefore(item, feed.firstChild);
+  requestAnimationFrame(() => { item.style.transition='opacity .3s'; item.style.opacity='1'; });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  REPORTS
+// ═══════════════════════════════════════════════════════════
+function refreshReports() {
+  const runs = STATE.runHistory;
+  const total = runs.length;
+  const passed = runs.filter(r=>r.status==='pass').length;
+  const failed = total - passed;
+  const passRate = total ? Math.round((passed/total)*100) : null;
+  const avgDur = total ? (runs.reduce((s,r)=>s+parseFloat(r.duration),0)/total).toFixed(1)+'s' : '—';
+
+  document.getElementById('rStatRuns').textContent = total;
+  document.getElementById('rStatPass').textContent = passRate !== null ? passRate+'%' : '—';
+  document.getElementById('rStatDur').textContent = avgDur;
+  document.getElementById('rStatHeal').textContent = STATE.totalHeals;
+
+  // Donut
+  if(total > 0) {
+    const pct = passRate;
+    const failPct = 100 - pct;
+    document.getElementById('donutChart').style.background =
+      `conic-gradient(var(--green) 0% ${pct}%, var(--red) ${pct}% 100%)`;
+    document.getElementById('donutPct').textContent = pct + '%';
+    document.getElementById('lgPass').textContent = `Passed: ${passed}`;
+    document.getElementById('lgFail').textContent = `Failed: ${failed}`;
+  }
+
+  // Trend
+  if(runs.length) {
+    document.getElementById('trendChart').innerHTML = runs.map(r =>
+      `<div class="trend-b" style="background:${r.status==='pass'?'var(--green)':'var(--red)'};height:${50+Math.random()*50}%" title="${r.suite}: ${r.status}"></div>`
+    ).join('');
+  }
+
+  // Table
+  if(runs.length) {
+    document.getElementById('reportRunTable').innerHTML = runs.slice().reverse().map(r => `
+      <tr>
+        <td><span class="mono" style="color:var(--t3)">#${r.id}</span></td>
+        <td><strong style="color:var(--t1)">${escHtml(r.suite)}</strong></td>
+        <td><span class="badge ${r.status==='pass'?'b-pass':'b-fail'}">${r.status}</span></td>
+        <td style="color:var(--green)">${r.passed}</td>
+        <td style="color:var(--red)">${r.failed}</td>
+        <td>${r.duration}s</td>
+        <td>${r.browser}</td>
+        <td>${timeAgo(r.timestamp)}</td>
+      </tr>
+    `).join('');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MODALS / ENV / MISC
+// ═══════════════════════════════════════════════════════════
+function showModal(id) { document.getElementById(id).classList.add('open'); }
+function hideModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', (e) => { if(e.target === m) m.classList.remove('open'); });
+});
+
+function createSuite() {
+  const name = document.getElementById('newSuiteName').value.trim();
+  if(!name) { toast('Please enter a suite name', '⚠️'); return; }
+  const suite = {
+    id: STATE.suites.length,
+    name,
+    url: document.getElementById('newSuiteUrl').value || 'https://example.com',
+    browser: document.getElementById('newSuiteBrowser').value,
+    steps: []
+  };
+  STATE.suites.push(suite);
+  const sel = document.getElementById('suiteSelector');
+  const opt = document.createElement('option');
+  opt.value = suite.id; opt.textContent = name;
+  sel.appendChild(opt);
+  const rSel = document.getElementById('runSuiteSelect');
+  const opt2 = document.createElement('option');
+  opt2.value = suite.id; opt2.textContent = name;
+  rSel.appendChild(opt2);
+  hideModal('suiteModal');
+  loadSuite(suite.id);
+  sel.value = suite.id;
+  switchPage('builder');
+  toast(`Suite "${name}" created!`, '✅');
+}
+
+function cycleEnv() {
+  STATE.envIdx = (STATE.envIdx + 1) % STATE.envs.length;
+  document.getElementById('envLabel').textContent = STATE.envs[STATE.envIdx];
+  const dot = document.querySelector('.env-dot');
+  const colors = ['var(--green)', 'var(--red)', 'var(--yellow)'];
+  dot.style.background = colors[STATE.envIdx];
+  toast(`Environment: ${STATE.envs[STATE.envIdx]}`, '🌐');
+}
+
+function selectBrowser(el, b) {
+  STATE.browser = b;
+  document.querySelectorAll('.browser-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function exportReport() { toast('Allure report exported to /reports/', '📤'); }
+
+function copyCode() {
+  const code = document.querySelector('#editorBody pre, #editorBody div[style*="font-family"]');
+  if(code) { navigator.clipboard?.writeText(code.textContent).catch(()=>{}); }
+  toast('Code copied to clipboard', '📋');
+}
+
+function downloadCode() {
+  const suite = STATE.suites[STATE.currentSuite];
+  const code = generateScript(suite);
+  const blob = new Blob([code], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = suite.name.replace(/\s+/g,'-').toLowerCase() + '.spec.ts';
+  a.click();
+  toast('Script downloaded', '💾');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════════════════
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function timeAgo(d) {
+  const s = Math.floor((Date.now()-d)/1000);
+  if(s < 10) return 'just now';
+  if(s < 60) return s + 's ago';
+  if(s < 3600) return Math.floor(s/60) + 'm ago';
+  return Math.floor(s/3600) + 'h ago';
+}
+
+function toast(msg, icon='✅') {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastIcon').textContent = icon;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  loadSuite(0);
+  refreshDashboard();
+  setupInspector();
+  // Render initial step progress empty state is handled
+});
+</script>
+</body>
+</html>
