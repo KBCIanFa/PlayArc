@@ -1,1 +1,2474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlayArc — Playwright Automation Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700&family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#07101C;--bg2:#0C1A2B;--bg3:#112236;--bg4:#162C42;--bg5:#1C3550;
+  --cyan:#00D4FF;--cyan2:#009DC4;--clo:rgba(0,212,255,.12);--cxs:rgba(0,212,255,.06);
+  --green:#00E5A0;--glo:rgba(0,229,160,.1);
+  --orange:#FF8C42;--olo:rgba(255,140,66,.1);
+  --red:#FF3D6B;--rlo:rgba(255,61,107,.1);
+  --yellow:#FFD166;--ylo:rgba(255,209,102,.1);
+  --purple:#A78BFA;--plo:rgba(167,139,250,.1);
+  --t1:#E4F0FB;--t2:#7A9EBF;--t3:#365470;
+  --b1:rgba(0,212,255,.12);--b2:rgba(255,255,255,.05);--b3:rgba(255,255,255,.03);
+  --fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--fm:'JetBrains Mono',monospace;
+  --r:7px;--sb:205px;--tb:46px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;background:var(--bg);}
+body{font-family:var(--fb);color:var(--t1);font-size:13px;}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--t3);border-radius:3px;}
+input,select,textarea,button{font-family:var(--fb);}
 
+/* ── LAYOUT ── */
+#app{display:flex;flex-direction:column;height:100vh;}
+#topbar{height:var(--tb);background:var(--bg2);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 12px;gap:5px;flex-shrink:0;z-index:300;}
+.logo{display:flex;align-items:center;gap:7px;font-family:var(--fd);font-weight:800;font-size:15px;letter-spacing:-.5px;margin-right:10px;text-decoration:none;color:var(--t1);}
+.logo-mark{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,var(--cyan),var(--cyan2));display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 0 14px rgba(0,212,255,.35);}
+.logo em{color:var(--cyan);font-style:normal;}
+.logo-v{font-size:9px;background:var(--clo);color:var(--cyan);padding:1px 5px;border-radius:3px;font-weight:700;}
+.ntab{padding:4px 11px;border-radius:5px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;transition:all .13s;display:flex;align-items:center;gap:5px;border:1px solid transparent;white-space:nowrap;}
+.ntab:hover{background:var(--b2);color:var(--t1);}
+.ntab.active{background:var(--clo);color:var(--cyan);border-color:var(--b1);}
+.tbr{display:flex;align-items:center;gap:6px;margin-left:auto;}
+.env-badge{display:flex;align-items:center;gap:5px;padding:3px 9px;border-radius:4px;background:var(--bg3);border:1px solid var(--b2);font-size:11px;font-weight:600;color:var(--t2);cursor:pointer;transition:all .13s;}
+.env-badge:hover{border-color:var(--b1);color:var(--t1);}
+.env-led{width:5px;height:5px;border-radius:50%;background:var(--green);}
+#main{display:flex;flex:1;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+#sidebar{width:var(--sb);background:var(--bg2);border-right:1px solid var(--b2);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.sbs{padding:9px 7px 3px;}
+.sbl{font-size:9px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--t3);padding:0 7px 3px;}
+.sbi{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:5px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;transition:all .12s;margin-bottom:1px;border:1px solid transparent;}
+.sbi:hover{background:var(--b2);color:var(--t1);}
+.sbi.active{background:var(--clo);color:var(--cyan);border-color:var(--b1);}
+.sbi-ic{font-size:13px;width:15px;text-align:center;flex-shrink:0;}
+.sbi-badge{margin-left:auto;padding:1px 5px;border-radius:8px;font-size:9px;font-weight:700;}
+.sb-div{height:1px;background:var(--b2);margin:5px 9px;}
+.sb-bot{margin-top:auto;padding:7px;border-top:1px solid var(--b2);}
+
+/* ── PAGES ── */
+.page{display:none;flex-direction:column;flex:1;overflow:hidden;}
+.page.active{display:flex;}
+.ph{padding:11px 16px 8px;border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:8px;flex-shrink:0;background:var(--bg2);}
+.pt{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--t1);}
+.ps{font-size:11px;color:var(--t3);margin-top:1px;}
+.pa{display:flex;gap:5px;align-items:center;margin-left:auto;}
+.pb{flex:1;overflow:auto;padding:13px 16px;}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:5px;font-size:11px;font-weight:600;border:none;cursor:pointer;transition:all .13s;white-space:nowrap;}
+.bp{background:var(--cyan);color:var(--bg);}
+.bp:hover{background:#26DDFF;box-shadow:0 0 14px rgba(0,212,255,.3);}
+.bs{background:var(--green);color:var(--bg);}
+.bs:hover{background:#26FFBB;}
+.bd{background:var(--rlo);color:var(--red);border:1px solid rgba(255,61,107,.2);}
+.bd:hover{background:rgba(255,61,107,.2);}
+.bg{background:transparent;color:var(--t2);border:1px solid var(--b2);}
+.bg:hover{color:var(--t1);border-color:var(--b1);}
+.bsm{padding:3px 8px;font-size:11px;}
+.btn:disabled{opacity:.35;cursor:not-allowed;}
+
+/* ── CARDS ── */
+.card{background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r);padding:12px;}
+.ch{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);margin-bottom:8px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;}
+.sv{font-family:var(--fd);font-size:28px;font-weight:800;line-height:1;color:var(--t1);}
+.sl{font-size:11px;color:var(--t2);margin-top:3px;}
+.sc{display:inline-block;margin-top:6px;padding:2px 6px;border-radius:3px;font-size:10px;font-weight:600;}
+.cup{background:var(--glo);color:var(--green);}
+.cdn{background:var(--rlo);color:var(--red);}
+.cor{background:var(--olo);color:var(--orange);}
+.spark{display:flex;align-items:flex-end;gap:2px;height:24px;margin-top:6px;}
+.spk{flex:1;border-radius:1px 1px 0 0;opacity:.7;}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:3px;font-size:10px;font-weight:700;}
+.badge::before{content:'';width:4px;height:4px;border-radius:50%;background:currentColor;}
+.bpass{background:var(--glo);color:var(--green);}
+.bfail{background:var(--rlo);color:var(--red);}
+.brun{background:var(--clo);color:var(--cyan);}
+.bheal{background:var(--olo);color:var(--orange);}
+.bq{background:var(--b2);color:var(--t2);}
+.bpurp{background:var(--plo);color:var(--purple);}
+
+/* ── PROGRESS ── */
+.pbar{height:3px;background:var(--b2);border-radius:3px;overflow:hidden;}
+.pf{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--cyan),var(--green));transition:width .5s;}
+.pf.r{background:linear-gradient(90deg,var(--orange),var(--red));}
+.pf.o{background:linear-gradient(90deg,var(--yellow),var(--orange));}
+
+/* ── TABLES ── */
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{text-align:left;font-size:9px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--t3);padding:7px 9px;border-bottom:1px solid var(--b2);}
+.tbl td{padding:7px 9px;font-size:12px;color:var(--t2);border-bottom:1px solid var(--b3);}
+.tbl tr:hover td{background:var(--b2);color:var(--t1);}
+
+/* ── FORMS ── */
+.fl{font-size:9px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--t3);margin-bottom:3px;display:block;}
+.fi,.fsel{background:var(--bg);border:1px solid var(--b2);border-radius:5px;padding:6px 8px;font-size:12px;color:var(--t1);width:100%;transition:border-color .13s;}
+.fi:focus,.fsel:focus{outline:none;border-color:var(--cyan);}
+.fi.mono{font-family:var(--fm);font-size:11px;}
+.fsel{cursor:pointer;appearance:none;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px;}
+.ffield{display:flex;flex-direction:column;gap:3px;margin-bottom:8px;}
+textarea.fi{resize:vertical;min-height:55px;}
+
+/* ── SECTION TITLE ── */
+.stl{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);display:flex;align-items:center;gap:7px;margin:10px 0 6px;}
+.stl::after{content:'';flex:1;height:1px;background:var(--b2);}
+
+/* ── API STATUS BAR ── */
+#apiBar{
+  display:flex;align-items:center;gap:8px;
+  padding:4px 14px;background:var(--bg3);
+  border-bottom:1px solid var(--b2);
+  font-size:10px;color:var(--t3);flex-shrink:0;
+  font-family:var(--fm);
+}
+.api-method{padding:1px 5px;border-radius:3px;font-size:9px;font-weight:700;}
+.api-get{background:rgba(0,229,160,.15);color:var(--green);}
+.api-post{background:var(--clo);color:var(--cyan);}
+.api-put{background:var(--ylo);color:var(--yellow);}
+.api-del{background:var(--rlo);color:var(--red);}
+.api-url{color:var(--t2);flex:1;}
+.api-status{margin-left:auto;font-size:10px;}
+.api-status.ok{color:var(--green);}
+.api-status.err{color:var(--red);}
+.api-status.pend{color:var(--yellow);}
+#apiToggle{cursor:pointer;font-size:10px;padding:1px 7px;border-radius:3px;border:1px solid var(--b2);background:transparent;color:var(--t3);transition:all .13s;}
+#apiToggle:hover{color:var(--t1);border-color:var(--b1);}
+#apiLogPanel{
+  display:none;position:fixed;bottom:0;left:var(--sb);right:0;
+  height:200px;background:var(--bg2);border-top:2px solid var(--cyan);
+  z-index:500;flex-direction:column;
+}
+#apiLogPanel.open{display:flex;}
+.api-log-head{padding:6px 12px;border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:var(--t2);flex-shrink:0;}
+.api-log-stream{flex:1;overflow-y:auto;padding:4px 6px;font-family:var(--fm);font-size:10.5px;}
+.api-entry{display:flex;gap:8px;padding:2px 5px;border-radius:3px;line-height:1.5;}
+.api-entry:hover{background:var(--b2);}
+.api-entry-t{color:var(--t3);flex-shrink:0;width:52px;}
+.api-entry-m{flex-shrink:0;font-weight:700;width:40px;}
+.api-entry-m.get{color:var(--green);}
+.api-entry-m.post{color:var(--cyan);}
+.api-entry-m.put{color:var(--yellow);}
+.api-entry-m.delete{color:var(--red);}
+.api-entry-url{color:var(--t2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.api-entry-code{flex-shrink:0;}
+.api-entry-code.ok{color:var(--green);}
+.api-entry-code.err{color:var(--red);}
+.api-entry-dur{color:var(--t3);flex-shrink:0;width:46px;text-align:right;}
+
+/* ── BUILDER ── */
+.blayout{display:flex;flex:1;overflow:hidden;}
+.scol{width:275px;flex-shrink:0;border-right:1px solid var(--b2);display:flex;flex-direction:column;background:var(--bg2);}
+.shead{padding:7px 10px;border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--t2);flex-shrink:0;}
+.slist{flex:1;overflow-y:auto;padding:5px;}
+.step-c{display:flex;align-items:center;gap:5px;padding:7px 9px;border-radius:5px;border:1px solid var(--b2);background:var(--bg3);margin-bottom:3px;cursor:pointer;transition:all .12s;user-select:none;}
+.step-c:hover{border-color:var(--b1);background:var(--bg4);}
+.step-c.sel{border-color:var(--cyan);background:var(--clo);}
+.step-c.dragging{opacity:.35;border-style:dashed;}
+.step-c.dragover{border-color:var(--cyan);border-style:dashed;}
+.snum{width:17px;height:17px;border-radius:50%;background:var(--bg5);border:1px solid var(--b1);font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--t3);flex-shrink:0;font-family:var(--fm);}
+.step-c.sel .snum{background:var(--cyan);color:var(--bg);border-color:var(--cyan);}
+.stag{font-size:8px;font-weight:700;padding:2px 4px;border-radius:2px;font-family:var(--fm);text-transform:uppercase;flex-shrink:0;}
+.tnav{background:rgba(27,108,168,.25);color:#7EC8FF;}
+.tclk{background:var(--glo);color:var(--green);}
+.tfil{background:var(--ylo);color:var(--yellow);}
+.tass{background:var(--olo);color:var(--orange);}
+.twat{background:var(--b2);color:var(--t2);}
+.tsht{background:var(--clo);color:var(--cyan);}
+.tjs{background:var(--plo);color:var(--purple);}
+.tsel{background:var(--ylo);color:var(--yellow);}
+.tkey{background:var(--rlo);color:var(--red);}
+.thov{background:var(--glo);color:var(--green);}
+.sdesc{font-size:11px;color:var(--t2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.step-c.sel .sdesc{color:var(--t1);}
+.sstatus{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.sacts{display:flex;gap:2px;margin-left:auto;opacity:0;transition:opacity .12s;}
+.step-c:hover .sacts,.step-c.sel .sacts{opacity:1;}
+.sa{width:16px;height:16px;border-radius:3px;background:var(--bg);border:1px solid var(--b2);color:var(--t3);font-size:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s;}
+.sa:hover{color:var(--cyan);border-color:var(--b1);}
+.sa.del:hover{color:var(--red);}
+.addbar{padding:8px;border-top:1px solid var(--b2);background:var(--bg2);flex-shrink:0;}
+.addlbl{font-size:8px;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px;}
+.addbtns{display:flex;gap:3px;flex-wrap:wrap;}
+.atb{padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;border:1px solid var(--b2);background:var(--bg);color:var(--t2);cursor:pointer;font-family:var(--fm);transition:all .12s;}
+.atb:hover{border-color:var(--cyan);color:var(--cyan);}
+.ecol{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.ebody{flex:1;overflow:auto;padding:12px;}
+.lrow{display:flex;align-items:center;gap:7px;padding:4px 8px;border-radius:4px;background:var(--bg);border:1px solid var(--b2);margin-bottom:3px;}
+.ltype{font-size:9px;font-weight:700;color:var(--cyan);font-family:var(--fm);width:76px;flex-shrink:0;}
+.lval{font-size:10px;color:var(--t2);font-family:var(--fm);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lbadge{font-size:9px;font-weight:700;margin-left:auto;}
+.hbox{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:5px;background:var(--glo);border:1px solid rgba(0,229,160,.2);margin-bottom:7px;}
+.hnum{font-family:var(--fd);font-size:22px;font-weight:800;color:var(--green);}
+.dcol{width:235px;flex-shrink:0;border-left:1px solid var(--b2);display:flex;flex-direction:column;background:var(--bg2);overflow:hidden;}
+.dhead{padding:7px 10px;border-bottom:1px solid var(--b2);font-size:11px;font-weight:600;color:var(--t2);flex-shrink:0;display:flex;align-items:center;gap:5px;}
+.dbody{flex:1;overflow-y:auto;padding:6px;}
+.dr-item{padding:6px 8px;border-radius:4px;border:1px solid var(--b2);background:var(--bg3);margin-bottom:3px;cursor:pointer;transition:all .12s;}
+.dr-item:hover{border-color:var(--cyan);background:var(--bg4);}
+.dr-name{font-size:11px;font-weight:600;color:var(--t1);margin-bottom:1px;}
+.dr-sel{font-size:10px;color:var(--cyan);font-family:var(--fm);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dr-meta{font-size:9px;color:var(--t3);margin-top:2px;}
+
+/* ── INSPECTOR ── */
+.ilayout{display:flex;flex:1;overflow:hidden;}
+.ibrowser{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--b2);}
+.ibar{background:var(--bg3);border-bottom:1px solid var(--b2);padding:6px 9px;display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.urlbox{flex:1;display:flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--b2);border-radius:5px;padding:0 8px;height:28px;transition:border-color .13s;}
+.urlbox:focus-within{border-color:var(--cyan);}
+.url-proto{font-size:10px;color:var(--cyan2);font-family:var(--fm);flex-shrink:0;}
+.urlinput{flex:1;background:transparent;border:none;outline:none;font-size:12px;font-family:var(--fm);color:var(--t1);}
+.ssl-ic{font-size:10px;color:var(--green);flex-shrink:0;}
+.iframe-wrap{flex:1;position:relative;background:var(--bg);overflow:hidden;}
+#liveFrame{width:100%;height:100%;border:none;background:white;}
+.iframe-ov{position:absolute;inset:0;pointer-events:none;z-index:10;}
+.iframe-ov.active{pointer-events:auto;cursor:crosshair;}
+.pick-banner{position:absolute;top:0;left:0;right:0;background:linear-gradient(135deg,rgba(0,212,255,.92),rgba(0,157,196,.92));padding:5px 12px;display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:var(--bg);z-index:20;transition:all .2s;}
+.pick-banner.hidden{transform:translateY(-100%);opacity:0;}
+.cors-notice{position:absolute;inset:0;background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;color:var(--t2);text-align:center;padding:24px;z-index:5;}
+.cors-notice h3{font-family:var(--fd);font-size:15px;color:var(--t1);}
+.ipanel{width:310px;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
+.iphead{padding:8px 12px;border-bottom:1px solid var(--b2);font-size:11px;font-weight:600;color:var(--t2);flex-shrink:0;background:var(--bg2);display:flex;align-items:center;gap:5px;}
+.ipbody{flex:1;overflow-y:auto;padding:9px;}
+.attr-r{display:flex;gap:7px;padding:3px 6px;border-radius:3px;font-size:10px;border-bottom:1px solid var(--b3);}
+.attr-r:hover{background:var(--b2);}
+.ak{color:var(--cyan);font-family:var(--fm);width:90px;flex-shrink:0;}
+.av{color:var(--t2);font-family:var(--fm);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.av.grn{color:var(--green);}
+.aibox{background:linear-gradient(135deg,rgba(0,212,255,.05),rgba(0,229,160,.05));border:1px solid rgba(0,212,255,.15);border-radius:5px;padding:8px 9px;margin-bottom:7px;}
+.ailbl{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--cyan);margin-bottom:3px;}
+.aitxt{font-size:11px;color:var(--t2);line-height:1.5;}
+
+/* ── OBJECT REPO ── */
+.orlayout{display:flex;flex:1;overflow:hidden;}
+.or-list{width:290px;flex-shrink:0;border-right:1px solid var(--b2);display:flex;flex-direction:column;}
+.or-head{padding:8px 10px;border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:5px;flex-shrink:0;background:var(--bg2);}
+.or-items{flex:1;overflow-y:auto;padding:6px;}
+.or-item{padding:8px 10px;border-radius:5px;border:1px solid var(--b2);background:var(--bg3);margin-bottom:4px;cursor:pointer;transition:all .12s;}
+.or-item:hover{border-color:var(--b1);background:var(--bg4);}
+.or-item.sel{border-color:var(--cyan);background:var(--clo);}
+.or-iname{font-size:12px;font-weight:600;color:var(--t1);}
+.or-isel{font-size:10px;color:var(--cyan);font-family:var(--fm);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.or-itag{font-size:9px;color:var(--t3);margin-top:2px;}
+.or-detail{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.locrow{display:flex;align-items:center;gap:7px;padding:5px 9px;border-radius:5px;background:var(--bg);border:1px solid var(--b2);margin-bottom:4px;}
+.locrow:hover{border-color:var(--b1);}
+.locrow input{background:transparent;border:none;outline:none;flex:1;font-size:11px;font-family:var(--fm);color:var(--t1);}
+.locrow-type{font-size:9px;font-weight:700;color:var(--cyan);font-family:var(--fm);width:72px;flex-shrink:0;}
+.heal-meter{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:5px;background:var(--glo);border:1px solid rgba(0,229,160,.2);margin-bottom:9px;}
+.hm-num{font-family:var(--fd);font-size:26px;font-weight:800;color:var(--green);}
+
+/* ── DATA TABLES ── */
+.dtlayout{display:flex;flex:1;overflow:hidden;}
+.dt-tables{width:210px;flex-shrink:0;border-right:1px solid var(--b2);display:flex;flex-direction:column;}
+.dt-thead{padding:8px 10px;border-bottom:1px solid var(--b2);flex-shrink:0;background:var(--bg2);display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--t2);}
+.dt-tlist{flex:1;overflow-y:auto;padding:5px;}
+.dt-titem{padding:7px 9px;border-radius:5px;border:1px solid var(--b2);background:var(--bg3);margin-bottom:3px;cursor:pointer;transition:all .12s;}
+.dt-titem:hover{border-color:var(--b1);background:var(--bg4);}
+.dt-titem.sel{border-color:var(--cyan);background:var(--clo);}
+.dt-tname{font-size:12px;font-weight:600;color:var(--t1);}
+.dt-tmeta{font-size:10px;color:var(--t3);margin-top:1px;}
+.dt-editor{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.dt-ehead{padding:8px 13px;border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:7px;flex-shrink:0;background:var(--bg2);}
+.dt-grid-wrap{flex:1;overflow:auto;}
+.dt-grid{border-collapse:collapse;min-width:100%;}
+.dt-grid th{background:var(--bg3);border:1px solid var(--b2);padding:6px 10px;font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--t2);position:sticky;top:0;z-index:10;white-space:nowrap;user-select:none;cursor:pointer;}
+.dt-grid th:hover{background:var(--bg4);color:var(--t1);}
+.dt-grid th.add-col{color:var(--cyan);}
+.dt-grid td{border:1px solid var(--b3);padding:0;min-width:120px;}
+.dt-grid td input{width:100%;padding:5px 9px;background:transparent;border:none;outline:none;font-size:12px;color:var(--t1);}
+.dt-grid td input:focus{background:var(--cxs);}
+.dt-grid td.rn{width:36px;min-width:36px;background:var(--bg3);font-size:10px;font-family:var(--fm);color:var(--t3);text-align:center;padding:5px 3px;cursor:default;}
+.dt-grid tr:hover td:not(.rn){background:var(--bg2);}
+
+/* ── RUNNER ── */
+.rlayout{display:flex;flex:1;overflow:hidden;}
+.logpanel{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--b2);}
+.lgh{padding:7px 12px;border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:7px;flex-shrink:0;background:var(--bg2);}
+.puls{width:7px;height:7px;border-radius:50%;background:var(--green);animation:puls 1.4s infinite;}
+@keyframes puls{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,229,160,.4);}50%{opacity:.5;box-shadow:0 0 0 4px rgba(0,229,160,0);}}
+.puls.r{background:var(--red);animation:pulsr 1.4s infinite;}
+@keyframes pulsr{0%,100%{box-shadow:0 0 0 0 rgba(255,61,107,.4);}50%{box-shadow:0 0 0 4px rgba(255,61,107,0);}}
+.puls.off{background:var(--t3);animation:none;}
+.lgstream{flex:1;overflow-y:auto;padding:5px 7px;font-family:var(--fm);font-size:10.5px;}
+.lge{display:flex;align-items:flex-start;gap:7px;padding:2px 5px;border-radius:3px;line-height:1.55;}
+.lge:hover{background:var(--b2);}
+.lgt{color:var(--t3);flex-shrink:0;width:54px;}
+.lgk{flex-shrink:0;font-weight:700;width:36px;}
+.lgk.info{color:var(--cyan);}
+.lgk.pass{color:var(--green);}
+.lgk.fail{color:var(--red);}
+.lgk.warn{color:var(--yellow);}
+.lgk.heal{color:var(--orange);}
+.lgk.step{color:var(--purple);}
+.lgk.data{color:var(--yellow);}
+.lgk.api{color:var(--cyan2);}
+.lgm{color:var(--t2);flex:1;}
+.lge.cur{background:var(--clo);}
+.lge.err{background:var(--rlo);}
+.lgfoot{padding:6px 12px;border-top:1px solid var(--b2);display:flex;gap:14px;flex-shrink:0;background:var(--bg2);font-size:11px;}
+.lgs{display:flex;align-items:center;gap:3px;}
+.rside{width:300px;display:flex;flex-direction:column;flex-shrink:0;}
+.rprev{padding:8px;border-bottom:1px solid var(--b2);flex-shrink:0;}
+.rprevlbl{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);margin-bottom:5px;}
+.rscreen{width:100%;aspect-ratio:16/9;background:var(--bg);border:1px solid var(--b1);border-radius:5px;overflow:hidden;position:relative;}
+.bm{position:absolute;inset:5px;background:var(--bg3);border-radius:3px;overflow:hidden;display:flex;flex-direction:column;}
+.bm-bar{height:14px;background:var(--bg4);display:flex;align-items:center;padding:0 4px;gap:2px;flex-shrink:0;}
+.bm-dot{width:3px;height:3px;border-radius:50%;}
+.bm-url{flex:1;height:6px;background:var(--bg);border-radius:2px;margin-left:3px;}
+.bm-c{flex:1;padding:4px;display:flex;flex-direction:column;gap:2px;overflow:hidden;}
+.bm-r{height:5px;border-radius:1px;background:var(--b2);}
+.bm-hl{border:2px solid var(--cyan);border-radius:2px;font-size:6px;color:var(--cyan);font-family:var(--fm);text-align:center;padding:1px;}
+.bm-inp{height:7px;background:var(--bg4);border:1px solid var(--b1);border-radius:1px;}
+.bm-btn{height:9px;background:var(--cyan2);border-radius:1px;opacity:.8;}
+.splist{flex:1;overflow-y:auto;padding:5px;}
+.spi{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:4px;margin-bottom:2px;font-size:10px;border:1px solid transparent;transition:all .13s;}
+.spi.done{border-color:rgba(0,229,160,.08);}
+.spi.cur{border-color:var(--cyan);background:var(--clo);}
+.spi.fail{border-color:rgba(255,61,107,.2);background:var(--rlo);}
+.spi.pend{opacity:.3;}
+.spi-ic{font-size:11px;flex-shrink:0;}
+.spi-t{font-family:var(--fm);color:var(--t2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.spi-d{font-size:9px;color:var(--t3);}
+.rcfg{display:flex;align-items:center;gap:7px;padding:6px 12px;border-bottom:1px solid var(--b2);background:var(--bg2);flex-shrink:0;flex-wrap:wrap;}
+.rclbl{font-size:9px;color:var(--t3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;}
+.bpill{padding:2px 8px;border-radius:3px;font-size:11px;font-weight:600;border:1px solid var(--b2);cursor:pointer;color:var(--t2);transition:all .12s;}
+.bpill.active{background:var(--clo);border-color:var(--b1);color:var(--cyan);}
+.rsel{background:var(--bg);border:1px solid var(--b2);border-radius:4px;padding:2px 7px;font-size:11px;color:var(--t1);cursor:pointer;}
+
+/* ── REPORTS ── */
+.donut{width:70px;height:70px;border-radius:50%;position:relative;flex-shrink:0;}
+.dhole{position:absolute;inset:11px;background:var(--bg3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:13px;font-weight:800;color:var(--t1);}
+.lerow{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2);}
+.ledot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.trendw{height:48px;display:flex;align-items:flex-end;gap:2px;margin-top:7px;}
+.trb{flex:1;border-radius:2px 2px 0 0;opacity:.7;min-height:3px;cursor:pointer;transition:opacity .15s;}
+.trb:hover{opacity:1;}
+.hcard{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:5px;margin-bottom:4px;font-size:11px;}
+.hcard.ok{background:var(--glo);border:1px solid rgba(0,229,160,.14);}
+.hcard.warn{background:var(--rlo);border:1px solid rgba(255,61,107,.14);}
+
+/* ── MODAL ── */
+.mover{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(5px);z-index:999;align-items:center;justify-content:center;}
+.mover.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--b1);border-radius:9px;padding:18px;min-width:340px;max-width:520px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.mtitle{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--t1);margin-bottom:13px;}
+.macts{display:flex;gap:6px;justify-content:flex-end;margin-top:14px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:50px;right:18px;z-index:9999;background:var(--bg3);border:1px solid var(--b1);border-radius:7px;padding:9px 12px;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--t1);box-shadow:0 8px 24px rgba(0,0,0,.4);transform:translateY(70px);opacity:0;transition:all .28s ease;pointer-events:none;max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* ── MISC ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:32px;color:var(--t3);font-size:12px;text-align:center;}
+.eic{font-size:28px;opacity:.35;}
+code{font-family:var(--fm);font-size:10px;background:var(--bg);padding:1px 4px;border-radius:3px;color:var(--cyan);}
+.tc{color:var(--cyan);}
+.tg{color:var(--green);}
+.tr{color:var(--red);}
+.to{color:var(--orange);}
+.tt2{color:var(--t2);}
+.w100{width:100%;}
+
+
+/* ── KEYWORD LIBRARY ── */
+.tkw{background:linear-gradient(135deg,rgba(255,209,102,.18),rgba(255,140,66,.12));color:var(--yellow);}
+.pkg-item{padding:8px 10px;border-radius:5px;border:1px solid var(--b2);background:var(--bg3);margin-bottom:4px;cursor:pointer;transition:all .12s;}
+.pkg-item:hover{border-color:var(--b1);}
+.pkg-item.sel{border-color:var(--yellow);background:rgba(255,209,102,.07);}
+.pkg-name{font-size:12px;font-weight:700;color:var(--t1);}
+.pkg-path{font-size:9px;color:var(--cyan);font-family:var(--fm);margin-top:1px;}
+.pkg-cnt{font-size:9px;color:var(--t3);margin-top:2px;}
+.kw-item{padding:8px 10px;border-radius:5px;border:1px solid var(--b2);background:var(--bg3);margin-bottom:3px;cursor:pointer;transition:all .12s;}
+.kw-item:hover{border-color:var(--b1);}
+.kw-item.sel{border-color:var(--yellow);background:rgba(255,209,102,.07);}
+.kw-name{font-size:12px;font-weight:700;color:var(--t1);font-family:var(--fm);}
+.kw-sig{font-size:10px;color:var(--t3);margin-top:1px;font-family:var(--fm);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.kw-tag{display:inline-block;padding:1px 4px;border-radius:2px;font-size:8px;font-weight:700;background:var(--ylo);color:var(--yellow);margin-right:2px;margin-top:2px;}
+.kw-body{font-family:var(--fm);font-size:11px;background:var(--bg);border:1px solid var(--b2);border-radius:5px;padding:10px;line-height:1.7;color:var(--t2);white-space:pre-wrap;resize:vertical;width:100%;min-height:120px;outline:none;}
+.kw-body:focus{border-color:var(--yellow);}
+/* ── LISTENERS ── */
+.listener-item{padding:9px 11px;border-radius:5px;border:1px solid var(--b2);background:var(--bg3);margin-bottom:4px;cursor:pointer;transition:all .12s;}
+.listener-item:hover{border-color:var(--b1);}
+.listener-item.sel{border-color:var(--cyan);background:var(--clo);}
+.listener-item.disabled{opacity:.4;}
+.ev-badge{display:inline-flex;align-items:center;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:700;font-family:var(--fm);}
+.ev-before{background:rgba(0,212,255,.12);color:var(--cyan);}
+.ev-after{background:var(--glo);color:var(--green);}
+.ev-error{background:var(--rlo);color:var(--red);}
+.toggle-sw{width:30px;height:16px;border-radius:8px;background:var(--b2);position:relative;cursor:pointer;transition:background .15s;flex-shrink:0;}
+.toggle-sw.on{background:var(--green);}
+.toggle-sw::after{content:'';position:absolute;width:12px;height:12px;border-radius:50%;background:white;top:2px;left:2px;transition:left .15s;}
+.toggle-sw.on::after{left:16px;}
+
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ══ TOPBAR ══════════════════════════════════════════════ -->
+<div id="topbar">
+  <a class="logo" href="#">
+    <div class="logo-mark">🎭</div>
+    Play<em>Arc</em>
+    <span class="logo-v">v2</span>
+  </a>
+  <div class="ntab active" data-page="dashboard">📊 Dashboard</div>
+  <div class="ntab" data-page="builder">🔧 Builder</div>
+  <div class="ntab" data-page="inspector">🔍 Inspector</div>
+  <div class="ntab" data-page="objrepo">🗄 Objects</div>
+  <div class="ntab" data-page="datatables">📋 Data Tables</div>
+  <div class="ntab" data-page="keywords">🔑 Keywords</div>
+  <div class="ntab" data-page="listeners">🎣 Listeners</div>
+  <div class="ntab" data-page="runner">▶ Runner</div>
+  <div class="ntab" data-page="reports">📈 Reports</div>
+  <div class="tbr">
+    <div class="env-badge" onclick="cycleEnv()">
+      <div class="env-led" id="envLed"></div>
+      <span id="envLbl">Staging</span>
+    </div>
+    <button class="btn bg bsm" onclick="showModal('newSuiteModal')">+ Suite</button>
+    <button class="btn bg bsm" onclick="showModal('newObjModal')">+ Object</button>
+    <button class="btn bp bsm" onclick="runCurrentSuite()">▶ Run</button>
+  </div>
+</div>
+
+<!-- ══ API STATUS BAR ════════════════════════════════════════ -->
+<div id="apiBar">
+  <span style="font-weight:700;color:var(--t2);margin-right:4px">API</span>
+  <span id="apiBarLast" style="display:flex;align-items:center;gap:8px;flex:1">
+    <span class="api-method api-get">GET</span>
+    <span class="api-url">/suites — waiting for first call</span>
+    <span class="api-status pend">ready</span>
+  </span>
+  <span style="color:var(--t3);margin:0 8px">Base: <code style="color:var(--cyan2)">http://localhost:4000/api</code></span>
+  <button id="apiToggle" onclick="toggleApiLog()">▾ API Log</button>
+</div>
+
+<div id="main">
+
+<!-- ══ SIDEBAR ═════════════════════════════════════════════ -->
+<div id="sidebar">
+  <div class="sbs">
+    <div class="sbl">Project</div>
+    <div class="sbi active" data-page="dashboard"><span class="sbi-ic">🏠</span>Dashboard</div>
+    <div class="sbi" data-page="builder"><span class="sbi-ic">🔧</span>Builder</div>
+    <div class="sbi" data-page="inspector"><span class="sbi-ic">🔍</span>Live Inspector</div>
+    <div class="sbi" data-page="objrepo"><span class="sbi-ic">🗄</span>Object Repo<span class="sbi-badge" style="background:var(--cyan2);color:white" id="sbObjCnt">5</span></div>
+    <div class="sbi" data-page="datatables"><span class="sbi-ic">📋</span>Data Tables<span class="sbi-badge" style="background:var(--purple);color:white" id="sbDtCnt">2</span></div>
+  </div>
+  <div class="sb-div"></div>
+  <div class="sbs">
+    <div class="sbl">Execution</div>
+    <div class="sbi" data-page="keywords"><span class="sbi-ic">🔑</span>Keywords<span class="sbi-badge" style="background:var(--yellow);color:var(--bg)" id="sbKwCnt">11</span></div>
+    <div class="sbi" data-page="listeners"><span class="sbi-ic">🎣</span>Listeners</div>
+    <div class="sbi" data-page="runner"><span class="sbi-ic">▶</span>Runner<span class="sbi-badge" style="background:var(--green);color:var(--bg)" id="sbRunCnt">0</span></div>
+    <div class="sbi"><span class="sbi-ic">📅</span>Schedules</div>
+    <div class="sbi"><span class="sbi-ic">⏳</span>Queue</div>
+  </div>
+  <div class="sb-div"></div>
+  <div class="sbs">
+    <div class="sbl">Analytics</div>
+    <div class="sbi" data-page="reports"><span class="sbi-ic">📈</span>Reports</div>
+    <div class="sbi"><span class="sbi-ic">🔥</span>Flaky Tests<span class="sbi-badge" style="background:var(--red);color:white">4</span></div>
+    <div class="sbi"><span class="sbi-ic">🩹</span>Self-Healed<span class="sbi-badge" style="background:var(--orange);color:var(--bg)" id="sbHealCnt">7</span></div>
+  </div>
+  <div class="sb-div"></div>
+  <div class="sbs">
+    <div class="sbl">Integrations</div>
+    <div class="sbi"><span class="sbi-ic">🐙</span>GitHub Actions</div>
+    <div class="sbi"><span class="sbi-ic">🐛</span>Jira</div>
+    <div class="sbi"><span class="sbi-ic">💬</span>Slack</div>
+  </div>
+  <div class="sb-bot">
+    <div class="sbi"><span class="sbi-ic">⚙</span>Settings</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     DASHBOARD
+══════════════════════════════════════════════════════════ -->
+<div class="page active" id="page-dashboard">
+  <div class="ph">
+    <div><div class="pt">Dashboard</div><div class="ps" id="dSub">No runs yet</div></div>
+    <div class="pa">
+      <button class="btn bg bsm" onclick="exportReport()">📤 Export</button>
+      <button class="btn bs bsm" onclick="runCurrentSuite()">▶ Run All</button>
+    </div>
+  </div>
+  <div class="pb">
+    <div class="g4" style="margin-bottom:12px">
+      <div class="card"><div class="ch">Total Runs</div><div class="sv" id="dStatRuns">0</div><div class="sl">All time</div><div class="spark" id="dSpark"></div></div>
+      <div class="card"><div class="ch">Pass Rate</div><div class="sv tg" id="dStatPass">—</div><div class="sl" id="dStatPassLbl">No runs</div><div class="sc cup" id="dStatChip" style="display:none"></div></div>
+      <div class="card"><div class="ch">Objects</div><div class="sv tc" id="dStatObj">5</div><div class="sl">In repository</div></div>
+      <div class="card"><div class="ch">Data Rows</div><div class="sv" style="color:var(--purple)" id="dStatRows">7</div><div class="sl">Across all tables</div></div>
+    </div>
+    <div class="g2" style="margin-bottom:12px">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:9px 13px 7px;border-bottom:1px solid var(--b2);display:flex;align-items:center;justify-content:space-between">
+          <div class="ch" style="margin:0">Recent Runs</div>
+          <button class="btn bg bsm" onclick="switchPage('runner')">All →</button>
+        </div>
+        <table class="tbl">
+          <thead><tr><th>Suite</th><th>Status</th><th>Browser</th><th>Passed</th><th>When</th></tr></thead>
+          <tbody id="dRunTable"><tr><td colspan="5" style="text-align:center;color:var(--t3);padding:16px">No runs yet — click ▶ Run All</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card"><div class="ch">Activity</div><div id="dActivity">
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--b3);font-size:11px"><div style="width:7px;height:7px;border-radius:50%;background:var(--cyan);margin-top:3px;flex-shrink:0"></div><div><div style="color:var(--t2)">Object repo loaded — <strong style="color:var(--t1)">5 objects</strong> ready</div><div style="font-size:9px;color:var(--t3);margin-top:1px">just now</div></div></div>
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:11px"><div style="width:7px;height:7px;border-radius:50%;background:var(--purple);margin-top:3px;flex-shrink:0"></div><div><div style="color:var(--t2)">Data tables ready — <strong style="color:var(--t1)">7 rows</strong> across 2 tables</div><div style="font-size:9px;color:var(--t3);margin-top:1px">just now</div></div></div>
+      </div></div>
+    </div>
+    <div class="card"><div class="ch">Suite Health</div><div id="dHealth"><div style="color:var(--t3);font-size:11px;text-align:center;padding:14px">Run a suite to see health metrics</div></div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     BUILDER
+══════════════════════════════════════════════════════════ -->
+<div class="page" id="page-builder">
+  <div class="ph">
+    <div>
+      <div class="pt">Builder — <span class="tc" id="bSuiteName">Login Flow</span></div>
+      <div class="ps" id="bSub">6 steps · chromium</div>
+    </div>
+    <div class="pa">
+      <select class="rsel" id="bSuiteSelect" onchange="loadSuite(this.value)">
+        <option value="0">Login Flow</option>
+        <option value="1">Checkout E2E</option>
+        <option value="2">Search &amp; Filter</option>
+      </select>
+      <button class="btn bg bsm" onclick="if(APP.etab==='script')showScriptView();else{document.querySelector('.etab[data-etab=script]').click()}">⟨/⟩ Script</button>
+      <button class="btn bg bsm" onclick="saveSuite()">💾 Save</button>
+      <button class="btn bs bsm" onclick="runCurrentSuite()">▶ Run</button>
+    </div>
+  </div>
+  <div class="blayout">
+    <!-- Steps list -->
+    <div class="scol">
+      <div class="shead"><span>Steps</span><span style="color:var(--t3);font-size:10px;margin-left:auto" id="bStepCnt">0</span></div>
+      <div class="slist" id="bStepList"></div>
+      <div class="addbar">
+        <div class="addlbl">+ Add Step</div>
+        <div class="addbtns">
+          <button class="atb" onclick="addStep('navigate')">NAV</button>
+          <button class="atb" onclick="addStep('click')">CLICK</button>
+          <button class="atb" onclick="addStep('fill')">FILL</button>
+          <button class="atb" onclick="addStep('assert_text')">ASSERT</button>
+          <button class="atb" onclick="addStep('wait')">WAIT</button>
+          <button class="atb" onclick="addStep('screenshot')">SHOT</button>
+          <button class="atb" onclick="addStep('hover')">HOVER</button>
+          <button class="atb" onclick="addStep('key')">KEY</button>
+          <button class="atb" onclick="addStep('select')">SELECT</button>
+          <button class="atb" onclick="addStep('js')">JS</button>
+          <button class="atb" onclick="addStep('keyword')" style="border-color:var(--yellow);color:var(--yellow)">KW</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editor -->
+    <div class="ecol">
+      <div style="display:flex;border-bottom:1px solid var(--b2);padding:0 12px;flex-shrink:0;background:var(--bg2)">
+        <div class="etab active" data-etab="manual" style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .12s">Manual</div>
+        <div class="etab" data-etab="script" style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .12s">Script</div>
+      </div>
+      <div class="ebody" id="bEditorBody">
+        <div class="empty"><div class="eic">👈</div>Select or add a step to edit</div>
+      </div>
+    </div>
+
+    <!-- Quick Insert panel -->
+    <div class="dcol">
+      <div class="dhead">
+        <span>⚡</span>Quick Insert
+        <button class="btn bg bsm" style="margin-left:auto;font-size:9px" onclick="switchPage('objrepo')">Manage →</button>
+      </div>
+      <div class="dbody">
+        <div class="stl" style="margin-top:0">Objects</div>
+        <div id="bObjRef"><div style="color:var(--t3);font-size:11px;text-align:center;padding:12px">Loading…</div></div>
+        <div class="stl">Data Values</div>
+        <div id="bDataRef"><div style="color:var(--t3);font-size:11px;text-align:center;padding:12px">Loading…</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     LIVE INSPECTOR
+══════════════════════════════════════════════════════════ -->
+<div class="page" id="page-inspector">
+  <div class="ph">
+    <div><div class="pt">Live Inspector</div><div class="ps">Load any URL · enable Pick Mode · click elements</div></div>
+    <div class="pa">
+      <select class="rsel" id="zoomSel" onchange="setZoom(this.value)">
+        <option value="1">100%</option><option value="0.75">75%</option><option value="0.5">50%</option>
+      </select>
+      <button class="btn bg bsm" id="pickBtn" onclick="togglePick()">🎯 Pick: OFF</button>
+      <button class="btn bg bsm" onclick="addCapturedToRepo()">💾 Save to Objects</button>
+      <button class="btn bp bsm" onclick="addCapturedToStep()">+ Add to Step</button>
+    </div>
+  </div>
+  <div class="ilayout">
+    <div class="ibrowser">
+      <div class="ibar">
+        <button class="btn bg bsm" onclick="iframeBack()">←</button>
+        <button class="btn bg bsm" onclick="iframeForward()">→</button>
+        <button class="btn bg bsm" onclick="reloadFrame()">↻</button>
+        <div class="urlbox">
+          <span class="url-proto" id="urlProto">https://</span>
+          <input class="urlinput" id="urlInput" value="example.com" placeholder="Enter any URL and press Enter…"
+                 onkeydown="if(event.key==='Enter')navigateTo(this.value)">
+          <span class="ssl-ic" id="sslIc">🔒</span>
+        </div>
+        <button class="btn bp bsm" onclick="navigateTo(document.getElementById('urlInput').value)">Go</button>
+      </div>
+      <div class="iframe-wrap" id="iframeWrap">
+        <div class="pick-banner hidden" id="pickBanner">
+          🎯 PICK MODE — Click any element to capture selectors
+          <button class="btn bsm" style="margin-left:auto;background:rgba(0,0,0,.2);color:white;border:1px solid rgba(255,255,255,.3)" onclick="togglePick()">✕ Exit</button>
+        </div>
+        <iframe id="liveFrame" src="https://example.com" sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+        <div class="iframe-ov" id="iframeOv" onclick="handleOverlayClick(event)"></div>
+        <div class="cors-notice" id="corsNotice" style="display:none">
+          <div style="font-size:32px">🔒</div>
+          <h3>Cross-Origin Restriction</h3>
+          <p style="font-size:11px;max-width:340px;line-height:1.6">This site uses <code>X-Frame-Options</code> or CSP headers that block iframe embedding. This is normal security behavior for most production sites.</p>
+          <div style="background:var(--bg3);border:1px solid var(--b2);border-radius:6px;padding:12px;text-align:left;font-size:11px;color:var(--t2);max-width:340px;line-height:1.8">
+            <strong style="color:var(--t1)">You can still use PlayArc:</strong><br>
+            • Manually paste selectors from browser DevTools (F12)<br>
+            • Use the manual entry form on the right →<br>
+            • Try sites that allow framing, like <a href="#" onclick="navigateTo('example.com')" style="color:var(--cyan)">example.com</a>
+          </div>
+          <button class="btn bp bsm" onclick="navigateTo('example.com')">Load example.com</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inspector Panel -->
+    <div class="ipanel">
+      <div class="iphead"><span>🎯</span><span id="capName">No element selected</span></div>
+      <div class="ipbody">
+        <div class="stl" style="margin-top:0">Properties</div>
+        <div id="capAttrs"><div style="color:var(--t3);font-size:11px;text-align:center;padding:16px">Enable Pick Mode and click an element<br>or paste a selector manually below</div></div>
+        <div class="stl">Locators</div>
+        <div id="capLocs"><div style="color:var(--t3);font-size:11px;text-align:center;padding:10px">—</div></div>
+        <div class="stl">Recommendation</div>
+        <div id="capAI"><div style="color:var(--t3);font-size:11px;text-align:center;padding:10px">—</div></div>
+        <div id="capActs" style="display:none;margin-top:9px">
+          <div style="display:flex;gap:5px">
+            <button class="btn bp w100" style="justify-content:center" onclick="addCapturedToStep()">+ Add to Test Step</button>
+            <button class="btn bg" onclick="copyCapSel()" title="Copy selector">📋</button>
+          </div>
+          <button class="btn bg w100" style="justify-content:center;margin-top:5px" onclick="addCapturedToRepo()">💾 Save to Object Repo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     OBJECT REPOSITORY
+══════════════════════════════════════════════════════════ -->
+<div class="page" id="page-objrepo">
+  <div class="ph">
+    <div><div class="pt">Object Repository</div><div class="ps" id="orSub">5 objects · 3 pages</div></div>
+    <div class="pa">
+      <input class="fi" style="width:175px;padding:4px 8px;font-size:11px" placeholder="🔍 Search objects…" id="orSearch" oninput="filterObjects()">
+      <button class="btn bg bsm" onclick="showModal('newObjModal')">+ New Object</button>
+    </div>
+  </div>
+  <div class="orlayout">
+    <div class="or-list">
+      <div class="or-head">
+        <span style="font-size:10px;font-weight:700;color:var(--t2)">Objects</span>
+        <span style="font-size:10px;color:var(--t3);margin-left:auto" id="orCount">5/5</span>
+      </div>
+      <div class="or-items" id="orItems"><div class="empty"><div class="eic">⏳</div>Loading…</div></div>
+    </div>
+    <div class="or-detail" id="orDetail">
+      <div class="empty"><div class="eic">🗄</div>Select an object to view &amp; edit details</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     DATA TABLES
+══════════════════════════════════════════════════════════ -->
+<div class="page" id="page-datatables">
+  <div class="ph">
+    <div><div class="pt">Data Tables</div><div class="ps" id="dtSub">2 tables · 7 rows</div></div>
+    <div class="pa">
+      <button class="btn bg bsm" onclick="showModal('newTableModal')">+ New Table</button>
+      <button class="btn bg bsm" onclick="impCSV()">📥 Import CSV</button>
+      <button class="btn bg bsm" onclick="expCSV()">📤 Export CSV</button>
+    </div>
+  </div>
+  <div class="dtlayout">
+    <div class="dt-tables">
+      <div class="dt-thead"><span>📋</span>Tables<span style="margin-left:auto;font-size:10px;color:var(--t3)" id="dtCount">2</span></div>
+      <div class="dt-tlist" id="dtList"><div class="empty" style="padding:16px"><div class="eic" style="font-size:18px">⏳</div>Loading…</div></div>
+    </div>
+    <div class="dt-editor" id="dtEditor">
+      <div class="empty"><div class="eic">📋</div>Select a table to view and edit data</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     KEYWORD LIBRARY
+══════════════════════════════════════════════════════════ -->
+<div class="page" id="page-keywords">
+  <div class="ph">
+    <div><div class="pt">Keyword Library</div><div class="ps" id="kwSub">4 packages · 11 keywords</div></div>
+    <div class="pa">
+      <input class="fi" style="width:175px;padding:4px 8px;font-size:11px" placeholder="🔍 Search keywords…" id="kwSearch" oninput="filterKeywords()">
+      <button class="btn bg bsm" onclick="showModal('newKwLibModal')">+ Package</button>
+      <button class="btn bp bsm" onclick="showModal('newKwModal')">+ Keyword</button>
+    </div>
+  </div>
+  <div style="display:flex;flex:1;overflow:hidden">
+    <!-- Package list -->
+    <div style="width:230px;flex-shrink:0;border-right:1px solid var(--b2);display:flex;flex-direction:column;background:var(--bg2)">
+      <div style="padding:7px 10px;border-bottom:1px solid var(--b2);font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.7px;text-transform:uppercase;flex-shrink:0">Packages</div>
+      <div style="flex:1;overflow-y:auto;padding:5px" id="kwPkgList"></div>
+    </div>
+    <!-- Keyword list -->
+    <div style="width:270px;flex-shrink:0;border-right:1px solid var(--b2);display:flex;flex-direction:column">
+      <div style="padding:7px 10px;border-bottom:1px solid var(--b2);font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.7px;text-transform:uppercase;flex-shrink:0;display:flex;align-items:center;gap:5px;background:var(--bg2)">
+        <span id="kwListTitle">All Keywords</span>
+        <span style="margin-left:auto;color:var(--cyan);font-size:9px" id="kwListCount"></span>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:5px" id="kwList"></div>
+    </div>
+    <!-- Keyword detail / editor -->
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden" id="kwDetail">
+      <div class="empty"><div class="eic">🔑</div>Select a keyword to view &amp; edit</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     TEST LISTENERS
+══════════════════════════════════════════════════════════ -->
+<div class="page" id="page-listeners">
+  <div class="ph">
+    <div><div class="pt">Test Listeners</div><div class="ps">Before/After hooks that run automatically around every suite and step</div></div>
+    <div class="pa">
+      <button class="btn bp bsm" onclick="showModal('newListenerModal')">+ New Listener</button>
+    </div>
+  </div>
+  <div style="display:flex;flex:1;overflow:hidden">
+    <div style="width:300px;flex-shrink:0;border-right:1px solid var(--b2);display:flex;flex-direction:column;background:var(--bg2)">
+      <div style="padding:7px 10px;border-bottom:1px solid var(--b2);font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.7px;text-transform:uppercase">Hooks</div>
+      <div style="flex:1;overflow-y:auto;padding:6px" id="listenerList"></div>
+      <div style="padding:9px;border-top:1px solid var(--b2)">
+        <div style="font-size:10px;color:var(--t3);line-height:1.6;padding:7px 9px;background:var(--bg3);border-radius:5px;border:1px solid var(--b2)">
+          <strong style="color:var(--t2)">Execution Order</strong><br>
+          beforeSuite → beforeStep → step → afterStep → afterSuite<br>
+          onError fires on any uncaught exception
+        </div>
+      </div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden" id="listenerDetail">
+      <div class="empty"><div class="eic">🎣</div>Select a listener to edit its code</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     RUNNER
+══════════════════════════════════════════════════════════ -->
+<div class="page" id="page-runner">
+  <div class="ph">
+    <div><div class="pt">Live Runner</div><div class="ps" id="rSub">Ready</div></div>
+    <div class="pa">
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px">
+        <div class="puls off" id="rPulse"></div>
+        <span id="rStatusTxt" style="color:var(--t2)">Idle</span>
+      </div>
+      <button class="btn bd bsm" id="rStopBtn" onclick="stopRun()" disabled>⏹ Stop</button>
+      <button class="btn bs bsm" onclick="runCurrentSuite()">▶ Run Suite</button>
+    </div>
+  </div>
+  <div class="rcfg">
+    <span class="rclbl">BROWSER:</span>
+    <div class="bpill active" onclick="selBrowser(this,'chromium')">🌐 Chrome</div>
+    <div class="bpill" onclick="selBrowser(this,'firefox')">🦊 Firefox</div>
+    <div class="bpill" onclick="selBrowser(this,'webkit')">🍎 Safari</div>
+    <span class="rclbl" style="margin-left:8px">SUITE:</span>
+    <select class="rsel" id="rSuiteSelect"></select>
+    <span class="rclbl" style="margin-left:8px">SPEED:</span>
+    <select class="rsel" id="rSpeed"><option value="50">Fast</option><option value="350" selected>Normal</option><option value="900">Slow</option></select>
+    <span class="rclbl" style="margin-left:8px">DATA:</span>
+    <select class="rsel" id="rDataSelect"></select>
+    <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t2);cursor:pointer;margin-left:6px">
+      <input type="checkbox" id="rHeadless" checked style="accent-color:var(--cyan)"> Headless
+    </label>
+  </div>
+  <div class="rlayout">
+    <div class="logpanel">
+      <div class="lgh">
+        <div class="puls off" id="logPulse"></div>
+        <span style="font-size:11px;font-weight:600">Log Stream</span>
+        <span style="font-size:10px;color:var(--t3);margin-left:8px">API calls shown inline</span>
+        <button class="btn bg bsm" style="margin-left:auto" onclick="clearLog()">🗑 Clear</button>
+        <span style="font-size:10px;color:var(--t3)" id="wsStatus">● idle</span>
+      </div>
+      <div class="lgstream" id="logStream">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:7px;color:var(--t3)">
+          <div style="font-size:24px;opacity:.3">▶</div>
+          <div style="font-size:11px">Click ▶ Run Suite to begin</div>
+        </div>
+      </div>
+      <div class="lgfoot">
+        <div class="lgs"><span class="tg">✓</span><span id="lfPass" class="tg">0</span></div>
+        <div class="lgs"><span class="tr">✗</span><span id="lfFail" class="tr">0</span></div>
+        <div class="lgs"><span class="to">⚡</span><span id="lfHeal" class="to">0</span></div>
+        <div class="lgs" style="color:var(--purple)"><span>📋</span><span id="lfData">—</span></div>
+        <div class="lgs" style="margin-left:auto;color:var(--t3)"><span>⏱</span><span id="lfTime">0.0s</span></div>
+      </div>
+    </div>
+    <div class="rside">
+      <div class="rprev">
+        <div class="rprevlbl">Browser Preview</div>
+        <div class="rscreen">
+          <div class="bm">
+            <div class="bm-bar">
+              <div class="bm-dot" style="background:#FF5F57"></div>
+              <div class="bm-dot" style="background:#FEBC2E"></div>
+              <div class="bm-dot" style="background:#28C840"></div>
+              <div class="bm-url" id="bmUrl"></div>
+            </div>
+            <div class="bm-c" id="bmContent">
+              <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--t3);font-size:10px">Waiting…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:6px 9px;border-bottom:1px solid var(--b2);font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);flex-shrink:0;background:var(--bg2)">Step Progress</div>
+      <div class="splist" id="rStepList"><div class="empty" style="padding:16px"><div class="eic" style="font-size:18px">○</div>No run active</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     REPORTS
+══════════════════════════════════════════════════════════ -->
+<div class="page" id="page-reports">
+  <div class="ph">
+    <div><div class="pt">Reports &amp; Analytics</div><div class="ps">All suites · All time</div></div>
+    <div class="pa">
+      <button class="btn bg bsm" onclick="exportReport()">📤 Allure Export</button>
+      <button class="btn bp bsm" onclick="runCurrentSuite()">▶ New Run</button>
+    </div>
+  </div>
+  <div class="pb">
+    <div class="g4" style="margin-bottom:12px">
+      <div class="card"><div class="ch">Total Runs</div><div class="sv" id="rpRuns">0</div><div class="sl">All time</div></div>
+      <div class="card"><div class="ch">Pass Rate</div><div class="sv tg" id="rpPass">—</div><div class="sl">Overall</div></div>
+      <div class="card"><div class="ch">Avg Duration</div><div class="sv" id="rpDur">—</div><div class="sl">Per suite</div></div>
+      <div class="card"><div class="ch">Self-Healed</div><div class="sv to" id="rpHeal">7</div><div class="sl">Auto-fixed</div></div>
+    </div>
+    <div class="g2" style="margin-bottom:12px">
+      <div class="card">
+        <div class="ch">Pass / Fail Distribution</div>
+        <div style="display:flex;align-items:center;gap:14px;margin-top:7px">
+          <div class="donut" id="rpDonut" style="background:conic-gradient(var(--t3) 0%,var(--t3) 100%)"><div class="dhole" id="rpDonutPct">—</div></div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div class="lerow"><div class="ledot" style="background:var(--green)"></div><span id="rpLgPass">Passed: 0</span></div>
+            <div class="lerow"><div class="ledot" style="background:var(--red)"></div><span id="rpLgFail">Failed: 0</span></div>
+            <div class="lerow"><div class="ledot" style="background:var(--yellow)"></div><span>Flaky: 4</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card"><div class="ch">Run Trend</div><div class="trendw" id="rpTrend"><div style="display:flex;align-items:center;justify-content:center;width:100%;color:var(--t3);font-size:11px">Run tests to see trend</div></div></div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;margin-bottom:12px">
+      <div style="padding:9px 13px;border-bottom:1px solid var(--b2)"><div class="ch" style="margin:0">Run Log</div></div>
+      <table class="tbl">
+        <thead><tr><th>#</th><th>Suite</th><th>Status</th><th>✓</th><th>✗</th><th>Data Table</th><th>Duration</th><th>Browser</th><th>When</th></tr></thead>
+        <tbody id="rpTable"><tr><td colspan="9" style="text-align:center;color:var(--t3);padding:14px">No runs yet</td></tr></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="ch">Self-Healing Activity</div>
+      <div class="hcard ok"><span style="font-size:15px">⚡</span><div style="flex:1"><div style="font-size:11px;font-weight:600;color:var(--t1)">#checkout-btn → [data-testid="checkout-btn"]</div><div style="font-size:10px;color:var(--t3)">CSS changed after deploy · ARIA fallback succeeded</div></div><span class="badge bpass">healed</span></div>
+      <div class="hcard ok"><span style="font-size:15px">⚡</span><div style="flex:1"><div style="font-size:11px;font-weight:600;color:var(--t1)">.login-form button → role=button[name='Login']</div><div style="font-size:10px;color:var(--t3)">React refactor · auto-recovered via ARIA</div></div><span class="badge bpass">healed</span></div>
+      <div class="hcard warn"><span style="font-size:15px">⚠</span><div style="flex:1"><div style="font-size:11px;font-weight:600;color:var(--t1)">#payment-confirm — all fallbacks failed</div><div style="font-size:10px;color:var(--t3)">Element removed · manual fix required</div></div><span class="badge bfail">needs fix</span></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- #main -->
+</div><!-- #app -->
+
+<!-- ════════ MODALS ═══════════════════════════════════════ -->
+<div class="mover" id="newSuiteModal">
+  <div class="modal">
+    <div class="mtitle">Create Test Suite</div>
+    <div class="ffield"><label class="fl">Suite Name</label><input class="fi" id="nsSuiteName" placeholder="e.g. Checkout E2E"></div>
+    <div class="frow">
+      <div class="ffield"><label class="fl">Base URL</label><input class="fi mono" id="nsBaseUrl" placeholder="https://example.com"></div>
+      <div class="ffield"><label class="fl">Browser</label><select class="fsel" id="nsBrowser"><option>chromium</option><option>firefox</option><option>webkit</option></select></div>
+    </div>
+    <div class="macts"><button class="btn bg" onclick="hideModal('newSuiteModal')">Cancel</button><button class="btn bp" onclick="createSuite()">Create</button></div>
+  </div>
+</div>
+
+<div class="mover" id="newObjModal">
+  <div class="modal">
+    <div class="mtitle">Add to Object Repository</div>
+    <div class="frow">
+      <div class="ffield"><label class="fl">Object Name</label><input class="fi" id="noName" placeholder="e.g. Login Button"></div>
+      <div class="ffield"><label class="fl">Page / Group</label><input class="fi" id="noPage" placeholder="e.g. Login Page"></div>
+    </div>
+    <div class="ffield"><label class="fl">Primary Selector (data-testid preferred)</label><input class="fi mono" id="noSel" placeholder='[data-testid="login-btn"]'></div>
+    <div class="frow">
+      <div class="ffield"><label class="fl">ARIA Fallback</label><input class="fi mono" id="noAria" placeholder='[aria-label="Sign In"]'></div>
+      <div class="ffield"><label class="fl">CSS Fallback</label><input class="fi mono" id="noCss" placeholder=".login-btn"></div>
+    </div>
+    <div class="ffield"><label class="fl">XPath Fallback</label><input class="fi mono" id="noXpath" placeholder='//button[text()="Sign In"]'></div>
+    <div class="macts"><button class="btn bg" onclick="hideModal('newObjModal')">Cancel</button><button class="btn bp" onclick="createObject()">Save Object</button></div>
+  </div>
+</div>
+
+<div class="mover" id="newTableModal">
+  <div class="modal">
+    <div class="mtitle">Create Data Table</div>
+    <div class="ffield"><label class="fl">Table Name</label><input class="fi" id="ntName" placeholder="e.g. Test Users"></div>
+    <div class="ffield"><label class="fl">Description</label><input class="fi" id="ntDesc" placeholder="What data does this hold?"></div>
+    <div class="ffield"><label class="fl">Columns (comma-separated)</label><input class="fi" id="ntCols" value="username, password, expected_result"></div>
+    <div class="macts"><button class="btn bg" onclick="hideModal('newTableModal')">Cancel</button><button class="btn bp" onclick="createTable()">Create</button></div>
+  </div>
+</div>
+
+
+<div class="mover" id="newKwLibModal">
+  <div class="modal">
+    <div class="mtitle">New Keyword Package</div>
+    <div class="frow">
+      <div class="ffield"><label class="fl">Package Name</label><input class="fi" id="nklName" placeholder="e.g. LoginKeywords"></div>
+      <div class="ffield"><label class="fl">Package Path</label><input class="fi mono" id="nklPkg" placeholder="com.project.auth"></div>
+    </div>
+    <div class="ffield"><label class="fl">Description</label><input class="fi" id="nklDesc" placeholder="What does this package do?"></div>
+    <div class="macts"><button class="btn bg" onclick="hideModal('newKwLibModal')">Cancel</button><button class="btn bp" onclick="createKwLib()">Create</button></div>
+  </div>
+</div>
+
+<div class="mover" id="newKwModal">
+  <div class="modal" style="max-width:600px">
+    <div class="mtitle">New Keyword Function</div>
+    <div class="frow">
+      <div class="ffield"><label class="fl">Function Name (camelCase)</label><input class="fi mono" id="nkwName" placeholder="e.g. loginAs"></div>
+      <div class="ffield"><label class="fl">Package</label><select class="fsel" id="nkwPkg"></select></div>
+    </div>
+    <div class="ffield"><label class="fl">Description</label><input class="fi" id="nkwDesc" placeholder="What does this keyword do?"></div>
+    <div class="frow">
+      <div class="ffield"><label class="fl">Parameters (name:Type, comma-sep)</label><input class="fi mono" id="nkwParams" placeholder="username:String, timeout:number"></div>
+      <div class="ffield"><label class="fl">Returns</label><select class="fsel" id="nkwReturns"><option>void</option><option>String</option><option>boolean</option><option>number</option><option>Object</option></select></div>
+    </div>
+    <div class="ffield"><label class="fl">Tags (comma-separated)</label><input class="fi" id="nkwTags" placeholder="auth, login, utility"></div>
+    <div class="ffield"><label class="fl">Function Body (TypeScript / Playwright)</label>
+      <textarea class="fi mono" id="nkwBody" rows="5" placeholder="await page.fill('[data-testid=&quot;email&quot;]', username);&#10;await page.click('[data-testid=&quot;submit&quot;]');"></textarea></div>
+    <div class="macts"><button class="btn bg" onclick="hideModal('newKwModal')">Cancel</button><button class="btn bp" onclick="createKeyword()">Save Keyword</button></div>
+  </div>
+</div>
+
+<div class="mover" id="newListenerModal">
+  <div class="modal">
+    <div class="mtitle">New Test Listener</div>
+    <div class="frow">
+      <div class="ffield"><label class="fl">Name</label><input class="fi" id="nlName" placeholder="e.g. Screenshot on Fail"></div>
+      <div class="ffield"><label class="fl">Event</label><select class="fsel" id="nlEvent">
+        <option value="beforeSuite">beforeSuite</option><option value="afterSuite">afterSuite</option>
+        <option value="beforeStep">beforeStep</option><option value="afterStep">afterStep</option>
+        <option value="onError">onError</option>
+      </select></div>
+    </div>
+    <div class="ffield"><label class="fl">Hook Body</label>
+      <textarea class="fi mono" id="nlBody" rows="4" placeholder="// Access: page, test, error (afterStep/onError)&#10;await page.screenshot({ path: 'failure.png' });"></textarea></div>
+    <div class="macts"><button class="btn bg" onclick="hideModal('newListenerModal')">Cancel</button><button class="btn bp" onclick="createListener()">Create</button></div>
+  </div>
+</div>
+
+<!-- ════════ TOAST ════════════════════════════════════════ -->
+<div class="toast" id="toast">
+  <span style="font-size:15px" id="toastIc">✅</span>
+  <span id="toastMsg">Done</span>
+</div>
+
+<!-- ════════ API LOG PANEL ═══════════════════════════════ -->
+<div id="apiLogPanel">
+  <div class="api-log-head">
+    <span style="color:var(--cyan)">API</span>
+    <span>Request Log</span>
+    <span style="font-size:9px;color:var(--t3);margin-left:4px">— mock responses · swap BASE_URL in app.js to connect real backend</span>
+    <button class="btn bg bsm" style="margin-left:auto" onclick="document.getElementById('apiLogStream').innerHTML='';APP.apiLog=[]">Clear</button>
+    <button class="btn bg bsm" onclick="toggleApiLog()">✕ Close</button>
+  </div>
+  <div class="api-log-stream" id="apiLogStream"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  MOCK API CLIENT
+//  Simulates a real REST backend. Swap fetch() targets to
+//  connect a real Node/Playwright server.
+// ════════════════════════════════════════════════════════
+const BASE_URL = 'http://localhost:4000/api'; // Change to your real server
+
+const Api = {
+  _log(method, url, status, ms, body) {
+    const now = new Date();
+    const t = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+    const entry = { t, method: method.toLowerCase(), url, status, ms, body };
+    APP.apiLog.unshift(entry);
+    if (APP.apiLog.length > 100) APP.apiLog.pop();
+    renderApiBar(entry);
+    if (document.getElementById('apiLogPanel').classList.contains('open')) renderApiLog();
+  },
+
+  async _call(method, path, body) {
+    const url = BASE_URL + path;
+    const start = Date.now();
+    const delay = 60 + Math.random() * 180;
+
+    // Simulate network delay & response
+    await new Promise(r => setTimeout(r, delay));
+
+    // Mock responses — replace with real fetch when backend is ready:
+    // const res = await fetch(url, { method, headers:{'Content-Type':'application/json'}, body: body ? JSON.stringify(body) : undefined });
+    // const data = await res.json();
+
+    const ms = Math.round(Date.now() - start);
+    const mock = Api._mockResponse(method, path, body);
+    this._log(method, path, mock.status, ms, mock.data);
+    return mock;
+  },
+
+  _mockResponse(method, path, body) {
+    const suite = APP.suites[APP.suiteIdx];
+    if (path.startsWith('/suites') && method === 'GET')
+      return { status: 200, data: { suites: APP.suites.map(s => ({ id: s.id, name: s.name, steps: s.steps.length })) } };
+    if (path.startsWith('/suites') && method === 'POST')
+      return { status: 201, data: { id: Date.now(), ...body, message: 'Suite created' } };
+    if (path.includes('/run') && method === 'POST')
+      return { status: 202, data: { runId: 'run_' + Date.now(), status: 'queued', suite: suite?.name } };
+    if (path.startsWith('/objects') && method === 'GET')
+      return { status: 200, data: { objects: APP.objRepo } };
+    if (path.startsWith('/objects') && method === 'POST')
+      return { status: 201, data: { id: Date.now(), ...body } };
+    if (path.startsWith('/tables') && method === 'GET')
+      return { status: 200, data: { tables: APP.dataTables } };
+    if (path.startsWith('/tables') && method === 'POST')
+      return { status: 201, data: { id: Date.now(), ...body } };
+    if (path.includes('/results') && method === 'GET')
+      return { status: 200, data: { runs: APP.runHistory } };
+    if (path.includes('/heal') && method === 'POST')
+      return { status: 200, data: { healed: true, newSelector: body?.fallback || '[data-testid="element"]' } };
+    if (path.includes('/screenshot') && method === 'GET')
+      return { status: 200, data: { url: 'data:image/png;base64,...', name: body?.name } };
+    return { status: 200, data: { ok: true } };
+  },
+
+  // ── Public API methods (real endpoints to implement) ──
+  getSuites:        ()      => Api._call('GET',    '/suites'),
+  createSuite:      (body)  => Api._call('POST',   '/suites', body),
+  updateSuite:      (id, b) => Api._call('PUT',    `/suites/${id}`, b),
+  deleteSuite:      (id)    => Api._call('DELETE', `/suites/${id}`),
+  runSuite:         (id, b) => Api._call('POST',   `/suites/${id}/run`, b),
+  stopRun:          (runId) => Api._call('POST',   `/runs/${runId}/stop`),
+  getRunResults:    (runId) => Api._call('GET',    `/runs/${runId}/results`),
+  getObjects:       ()      => Api._call('GET',    '/objects'),
+  createObject:     (body)  => Api._call('POST',   '/objects', body),
+  updateObject:     (id, b) => Api._call('PUT',    `/objects/${id}`, b),
+  deleteObject:     (id)    => Api._call('DELETE', `/objects/${id}`),
+  getTables:        ()      => Api._call('GET',    '/tables'),
+  createTable:      (body)  => Api._call('POST',   '/tables', body),
+  updateTable:      (id, b) => Api._call('PUT',    `/tables/${id}`, b),
+  deleteTable:      (id)    => Api._call('DELETE', `/tables/${id}`),
+  healSelector:     (body)  => Api._call('POST',   '/heal', body),
+  getScreenshot:    (runId) => Api._call('GET',    `/runs/${runId}/screenshot`),
+  validateSelector: (body)  => Api._call('POST',   '/inspect/validate', body),
+};
+
+// ════════════════════════════════════════════════════════
+//  APP STATE
+// ════════════════════════════════════════════════════════
+const APP = {
+  page: 'dashboard', suiteIdx: 0, stepIdx: null, etab: 'manual',
+  browser: 'chromium', pickMode: false, capturedEl: null,
+  selObjIdx: null, selTableIdx: null,
+  runHistory: [], totalHeals: 7, isRunning: false, runTimer: null,
+  apiLog: [],
+  envs: ['Staging', 'Production', 'Development'], envIdx: 0,
+  dragSrc: null, idCtr: 300,
+  objRepo: [
+    { id:1, name:'Email Input',      page:'Login',    sel:'[data-testid="email-input"]',    aria:'[aria-label="Email"]',            css:'.email-input',    xpath:'//input[@type="email"]',           healscore:95, uses:3 },
+    { id:2, name:'Password Input',   page:'Login',    sel:'[data-testid="password-input"]', aria:'[aria-label="Password"]',         css:'.password-input', xpath:'//input[@type="password"]',        healscore:92, uses:3 },
+    { id:3, name:'Login Button',     page:'Login',    sel:'[data-testid="login-btn"]',      aria:'[aria-label="Sign In"]',          css:'.login-btn',      xpath:'//button[text()="Sign In"]',        healscore:97, uses:5 },
+    { id:4, name:'Add to Cart Btn',  page:'Products', sel:'[data-testid="add-to-cart"]',   aria:'[aria-label="Add to cart"]',      css:'.add-cart-btn',   xpath:'//button[contains(@class,"cart")]', healscore:88, uses:2 },
+    { id:5, name:'Checkout Button',  page:'Cart',     sel:'[data-testid="checkout-btn"]',  aria:'[aria-label="Checkout"]',         css:'.checkout-action',xpath:'//button[contains(text(),"Check")]',healscore:83, uses:2 },
+  ],
+  dataTables: [
+    { id:1, name:'Test Users', desc:'Login credentials', cols:['username','password','expected'], rows:[
+      ['admin@test.com','secret123','dashboard'],
+      ['user@test.com','pass456','home'],
+      ['invalid@test.com','wrongpass','error'],
+      ['locked@test.com','pass789','locked'],
+    ]},
+    { id:2, name:'Search Queries', desc:'Search test data', cols:['query','min_results','expected_top'], rows:[
+      ['laptop','10','MacBook Pro'],
+      ['phone','5','iPhone 15'],
+      ['headphones','3','Sony WH-1000XM5'],
+    ]},
+  ],
+  selKwLib: null, selKwId: null, selListener: null,
+  keywordLibs: [
+    { id:1, name:'AuthKeywords', pkg:'com.project.auth', desc:'Authentication and session management helpers',
+      keywords: [
+        { id:101, name:'loginAs', desc:'Full login flow using Object Repo credentials',
+          params:[{name:'username',type:'String'},{name:'password',type:'String'}], returns:'void', tags:['auth','login'], uses:3,
+          body:'// Uses Object Repo: Login/emailInput\nawait obj("Login/emailInput").fill(username);\nawait obj("Login/passwordInput").fill(password);\nawait obj("Login/loginButton").click();\nawait expect(page).toHaveURL(/dashboard/);' },
+        { id:102, name:'logout', desc:'Click logout and verify session ended',
+          params:[], returns:'void', tags:['auth','session'], uses:1,
+          body:'await page.click(\'[data-testid="user-menu"]\');\nawait page.click(\'[data-testid="logout-btn"]\');\nawait expect(page).toHaveURL(/login/);' },
+        { id:103, name:'assertLoggedIn', desc:'Verify user is authenticated',
+          params:[{name:'expectedUsername',type:'String'}], returns:'boolean', tags:['auth','assert'], uses:2,
+          body:'const el = page.locator(\'.welcome-msg\');\nawait expect(el).toContainText(expectedUsername);\nreturn true;' },
+      ]
+    },
+    { id:2, name:'CartKeywords', pkg:'com.project.commerce', desc:'Shopping cart and checkout helpers',
+      keywords: [
+        { id:201, name:'addProductToCart', desc:'Find product by name and add to cart',
+          params:[{name:'productName',type:'String'}], returns:'void', tags:['cart','product'], uses:2,
+          body:'await page.getByText(productName).click();\nawait obj("Products/addToCartBtn").click();\nawait expect(page.locator(\'.cart-badge\')).toBeVisible();' },
+        { id:202, name:'verifyCartCount', desc:'Assert cart badge shows expected count',
+          params:[{name:'expectedCount',type:'number'}], returns:'void', tags:['cart','assert'], uses:1,
+          body:'await expect(page.locator(\'.cart-badge\')).toContainText(String(expectedCount));' },
+        { id:203, name:'completePurchase', desc:'Fill payment details and submit order',
+          params:[{name:'cardNumber',type:'String'},{name:'expiry',type:'String'},{name:'cvv',type:'String'}], returns:'String', tags:['checkout','payment'], uses:1,
+          body:'await obj("Checkout/cardInput").fill(cardNumber);\nawait obj("Checkout/expiryInput").fill(expiry);\nawait obj("Checkout/cvvInput").fill(cvv);\nawait obj("Checkout/placeOrderBtn").click();\nreturn await page.locator(\'.order-id\').textContent();' },
+      ]
+    },
+    { id:3, name:'CommonKeywords', pkg:'com.project.common', desc:'General-purpose utilities used across all suites',
+      keywords: [
+        { id:301, name:'waitAndClick', desc:'Wait for element visibility then click with retry',
+          params:[{name:'selector',type:'String'},{name:'timeout',type:'number'}], returns:'void', tags:['utility','click'], uses:5,
+          body:'await page.waitForSelector(selector, { timeout });\nawait page.click(selector);' },
+        { id:302, name:'fillFromDataTable', desc:'Fill multiple fields from a data table row object',
+          params:[{name:'fields',type:'Object'}], returns:'void', tags:['utility','data'], uses:3,
+          body:'for (const [sel, val] of Object.entries(fields)) {\n  await page.fill(sel, String(val));\n}' },
+        { id:303, name:'captureAndLog', desc:'Take screenshot and log path to report',
+          params:[{name:'name',type:'String'}], returns:'void', tags:['utility','screenshot'], uses:4,
+          body:'const path = "screenshots/" + name + "-" + Date.now() + ".png";\nawait page.screenshot({ path, fullPage: true });\nconsole.log("[SCREENSHOT]", path);' },
+        { id:304, name:'retryAssertion', desc:'Retry a failing assertion N times before failing',
+          params:[{name:'fn',type:'Function'},{name:'retries',type:'number'}], returns:'void', tags:['utility','retry'], uses:2,
+          body:'for (let i = 0; i < retries; i++) {\n  try { await fn(); return; } catch(e) {\n    if (i === retries-1) throw e;\n    await page.waitForTimeout(500);\n  }\n}' },
+      ]
+    },
+    { id:4, name:'ApiKeywords', pkg:'com.project.api', desc:'REST API request helpers and response validators',
+      keywords: [
+        { id:401, name:'postJson', desc:'Send POST request and return parsed response',
+          params:[{name:'endpoint',type:'String'},{name:'body',type:'Object'}], returns:'Object', tags:['api','post'], uses:1,
+          body:'const res = await page.request.post(endpoint, { data: body });\nawait expect(res).toBeOK();\nreturn await res.json();' },
+        { id:402, name:'assertApiStatus', desc:'Assert API response status code matches expected',
+          params:[{name:'endpoint',type:'String'},{name:'expectedStatus',type:'number'}], returns:'void', tags:['api','assert'], uses:2,
+          body:'const res = await page.request.get(endpoint);\nexpect(res.status()).toBe(expectedStatus);' },
+      ]
+    },
+  ],
+  listeners: [
+    { id:1, event:'beforeSuite',  name:'Setup Environment',  enabled:true,
+      body:'// Runs before every suite\nawait page.goto(process.env.BASE_URL || "https://staging.app.com");\nawait page.context().clearCookies();' },
+    { id:2, event:'afterSuite',   name:'Cleanup & Report',   enabled:true,
+      body:'// Runs after every suite\nawait page.screenshot({ path: "results/final-state.png" });\nconsole.log("[LISTENER] Suite complete");' },
+    { id:3, event:'beforeStep',   name:'Log Step Start',     enabled:false,
+      body:'// Runs before each step\nconsole.log("[STEP START]", test.info().title);' },
+    { id:4, event:'afterStep',    name:'Heal on Failure',    enabled:true,
+      body:'// Runs after each step - auto-heal on failure\nif (error) { console.warn("[HEALER] trying fallback…"); }' },
+    { id:5, event:'onError',      name:'Screenshot on Fail', enabled:true,
+      body:'// Runs when any step throws\nawait page.screenshot({ path: "failures/" + Date.now() + ".png" });' },
+  ],
+  suites: [
+    { id:0, name:'Login Flow', url:'https://example.com', browser:'chromium', steps:[
+      { id:1, action:'navigate',    desc:'Go to login page',      value:'https://example.com/login',      selector:'',                              status:'pending' },
+      { id:2, action:'fill',        desc:'Enter email',           value:'{{username}}',                   selector:'[data-testid="email-input"]',   status:'pending', dataKey:'username', objId:1 },
+      { id:3, action:'fill',        desc:'Enter password',        value:'{{password}}',                   selector:'[data-testid="password-input"]',status:'pending', dataKey:'password', objId:2 },
+      { id:4, action:'click',       desc:'Click Sign In',         value:'',                               selector:'[data-testid="login-btn"]',     status:'pending', objId:3 },
+      { id:5, action:'assert_text', desc:'Assert welcome message',value:'Welcome',                        selector:'.welcome-msg',                  status:'pending' },
+      { id:6, action:'screenshot',  desc:'Capture result',        value:'login-success',                  selector:'',                              status:'pending' },
+    ]},
+    { id:1, name:'Checkout E2E', url:'https://example.com', browser:'chromium', steps:[
+      { id:1, action:'navigate',    desc:'Go to products',        value:'https://example.com/products',   selector:'',                              status:'pending' },
+      { id:2, action:'click',       desc:'Select first product',  value:'',                               selector:'.product-card:first-child',     status:'pending' },
+      { id:3, action:'click',       desc:'Add to cart',           value:'',                               selector:'[data-testid="add-to-cart"]',   status:'pending', objId:4 },
+      { id:4, action:'assert_text', desc:'Cart shows 1 item',     value:'1',                              selector:'.cart-badge',                   status:'pending' },
+      { id:5, action:'click',       desc:'Go to checkout',        value:'',                               selector:'[data-testid="checkout-btn"]',  status:'pending', objId:5 },
+      { id:6, action:'fill',        desc:'Enter card number',     value:'4111111111111111',               selector:'#card-number',                  status:'pending' },
+      { id:7, action:'click',       desc:'Place order',           value:'',                               selector:'[data-testid="place-order"]',   status:'pending' },
+      { id:8, action:'assert_text', desc:'Confirm order placed',  value:'Order Confirmed',                selector:'.order-confirmed',              status:'pending' },
+      { id:9, action:'screenshot',  desc:'Capture confirmation',  value:'order-confirmed',               selector:'',                              status:'pending' },
+    ]},
+    { id:2, name:'Search & Filter', url:'https://example.com', browser:'firefox', steps:[
+      { id:1, action:'navigate',    desc:'Go to search page',     value:'https://example.com/search',     selector:'',                              status:'pending' },
+      { id:2, action:'fill',        desc:'Type search query',     value:'{{query}}',                      selector:'[data-testid="search-input"]',  status:'pending', dataKey:'query' },
+      { id:3, action:'click',       desc:'Submit search',         value:'',                               selector:'[data-testid="search-btn"]',    status:'pending' },
+      { id:4, action:'assert_text', desc:'Results appear',        value:'results',                        selector:'.result-count',                 status:'pending' },
+      { id:5, action:'screenshot',  desc:'Capture results',       value:'search-results',                 selector:'',                              status:'pending' },
+    ]},
+  ],
+};
+
+// ════════════════════════════════════════════════════════
+//  UTILITIES
+// ════════════════════════════════════════════════════════
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const wait = ms => new Promise(r => setTimeout(r, ms));
+function timeAgo(d) {
+  const s = Math.floor((Date.now()-d)/1000);
+  if (s<10) return 'just now'; if (s<60) return s+'s ago';
+  if (s<3600) return Math.floor(s/60)+'m ago'; return Math.floor(s/3600)+'h ago';
+}
+function toast(msg, ic='✅') {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastIc').textContent = ic;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2800);
+}
+function showModal(id) { document.getElementById(id).classList.add('open'); }
+function hideModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.mover').forEach(m => m.addEventListener('click', e => { if (e.target===m) m.classList.remove('open'); }));
+
+function updateCounts() {
+  document.getElementById('sbObjCnt').textContent = APP.objRepo.length;
+  document.getElementById('sbDtCnt').textContent  = APP.dataTables.length;
+  document.getElementById('sbRunCnt').textContent = APP.runHistory.length;
+  document.getElementById('sbHealCnt').textContent = APP.totalHeals;
+  document.getElementById('dStatObj').textContent  = APP.objRepo.length;
+  document.getElementById('dStatRows').textContent = APP.dataTables.reduce((s,t)=>s+t.rows.length,0);
+}
+
+// ════════════════════════════════════════════════════════
+//  API BAR & LOG PANEL
+// ════════════════════════════════════════════════════════
+function renderApiBar(entry) {
+  const bar = document.getElementById('apiBarLast');
+  if (!bar) return;
+  const cls = entry.status >= 400 ? 'err' : entry.status >= 200 ? 'ok' : 'pend';
+  bar.innerHTML = `
+    <span class="api-method api-${entry.method}">${entry.method.toUpperCase()}</span>
+    <span class="api-url">${esc(entry.url)}</span>
+    <span class="api-status ${cls}">${entry.status} · ${entry.ms}ms</span>`;
+}
+
+function renderApiLog() {
+  const stream = document.getElementById('apiLogStream');
+  if (!stream) return;
+  stream.innerHTML = APP.apiLog.map(e => {
+    const cls = e.status >= 400 ? 'err' : 'ok';
+    return `<div class="api-entry">
+      <span class="api-entry-t">${esc(e.t)}</span>
+      <span class="api-entry-m ${e.method}">${e.method.toUpperCase()}</span>
+      <span class="api-entry-url">${esc(BASE_URL)}${esc(e.url)}</span>
+      <span class="api-entry-code ${cls}">${e.status}</span>
+      <span class="api-entry-dur">${e.ms}ms</span>
+    </div>`;
+  }).join('');
+}
+
+function toggleApiLog() {
+  const panel = document.getElementById('apiLogPanel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) renderApiLog();
+}
+
+// ════════════════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════════════════
+function switchPage(p) {
+  APP.page = p;
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.ntab,.sbi').forEach(x => x.classList.remove('active'));
+  const pg = document.getElementById('page-' + p);
+  if (pg) pg.classList.add('active');
+  document.querySelectorAll(`[data-page="${p}"]`).forEach(x => x.classList.add('active'));
+  if (p==='builder')    { renderStepList(); renderQuickRef(); }
+  if (p==='dashboard')  refreshDashboard();
+  if (p==='reports')    refreshReports();
+  if (p==='objrepo')    renderObjRepo();
+  if (p==='datatables') renderDataTables();
+  if (p==='runner')     syncRunnerUI();
+  if (p==='keywords')   { renderKeywords(); refreshKwPkgDropdown(); }
+  if (p==='listeners')  renderListeners();
+}
+document.querySelectorAll('.ntab').forEach(t => t.addEventListener('click', () => switchPage(t.dataset.page)));
+document.querySelectorAll('.sbi[data-page]').forEach(t => t.addEventListener('click', () => switchPage(t.dataset.page)));
+
+function cycleEnv() {
+  APP.envIdx = (APP.envIdx + 1) % APP.envs.length;
+  document.getElementById('envLbl').textContent = APP.envs[APP.envIdx];
+  const colors = ['var(--green)','var(--red)','var(--yellow)'];
+  document.getElementById('envLed').style.background = colors[APP.envIdx];
+  toast('Environment: ' + APP.envs[APP.envIdx], '🌐');
+}
+
+// ════════════════════════════════════════════════════════
+//  BUILDER
+// ════════════════════════════════════════════════════════
+const TAG_CLS = {navigate:'tnav',click:'tclk',fill:'tfil',assert_text:'tass',wait:'twat',screenshot:'tsht',js:'tjs',select:'tsel',key:'tkey',hover:'thov',keyword:'tkw'};
+const TAG_LBL = {navigate:'NAV',click:'CLICK',fill:'FILL',assert_text:'ASSERT',wait:'WAIT',screenshot:'SHOT',js:'JS',select:'SEL',key:'KEY',hover:'HOVER',keyword:'KW'};
+const ST_COL  = {pass:'var(--green)',fail:'var(--red)',pending:'var(--t3)'};
+
+function loadSuite(idx) {
+  APP.suiteIdx = +idx; APP.stepIdx = null;
+  const s = APP.suites[APP.suiteIdx];
+  document.getElementById('bSuiteName').textContent = s.name;
+  renderStepList();
+  document.getElementById('bEditorBody').innerHTML = '<div class="empty"><div class="eic">👈</div>Select a step to edit</div>';
+  renderQuickRef();
+}
+
+function renderStepList() {
+  const s = APP.suites[APP.suiteIdx];
+  document.getElementById('bStepCnt').textContent = s.steps.length + ' steps';
+  document.getElementById('bSub').textContent = `${s.steps.length} steps · ${s.browser} · ${APP.envs[APP.envIdx]}`;
+  const el = document.getElementById('bStepList');
+  if (!s.steps.length) { el.innerHTML='<div class="empty"><div class="eic">📝</div>Add steps below</div>'; return; }
+  el.innerHTML = s.steps.map((st,i) => {
+    const objTag  = st.objId   ? `<span style="font-size:8px;background:var(--clo);color:var(--cyan);padding:1px 4px;border-radius:2px;margin-left:2px">obj</span>` : '';
+    const dataTag = st.dataKey ? `<span style="font-size:8px;background:var(--plo);color:var(--purple);padding:1px 4px;border-radius:2px;margin-left:2px">data</span>` : '';
+    return `<div class="step-c${APP.stepIdx===i?' sel':''}" draggable="true"
+      onclick="selStep(${i})"
+      ondragstart="dStart(event,${i})" ondragover="dOver(event,${i})"
+      ondrop="dDrop(event,${i})" ondragend="dEnd()">
+      <div class="snum">${i+1}</div>
+      <span class="stag ${TAG_CLS[st.action]||'twat'}">${TAG_LBL[st.action]||st.action.slice(0,5).toUpperCase()}</span>
+      <span class="sdesc">${esc(st.desc||st.value||st.selector||'—')}</span>
+      ${objTag}${dataTag}
+      <div class="sstatus" style="background:${ST_COL[st.status]}"></div>
+      <div class="sacts">
+        <div class="sa" onclick="event.stopPropagation();dupeStep(${i})">⧉</div>
+        <div class="sa del" onclick="event.stopPropagation();delStep(${i})">✕</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selStep(i) { APP.stepIdx=i; renderStepList(); renderEditor(); }
+
+function addStep(action) {
+  const defs = { navigate:{desc:'Navigate to URL',value:'https://',selector:''},click:{desc:'Click element',selector:'',value:''},fill:{desc:'Fill field',selector:'',value:''},assert_text:{desc:'Assert text',selector:'',value:''},wait:{desc:'Wait for element',selector:'',value:'5000'},screenshot:{desc:'Take screenshot',selector:'',value:'screenshot'},js:{desc:'Execute JS',selector:'',value:''},select:{desc:'Select option',selector:'',value:''},key:{desc:'Press key',selector:'',value:'Enter'},hover:{desc:'Hover element',selector:'',value:''},keyword:{desc:'Call keyword function',value:'',selector:'',kwLib:'',kwName:''} };
+  const d = defs[action] || {desc:'Step',selector:'',value:''};
+  APP.suites[APP.suiteIdx].steps.push({id:++APP.idCtr, action, ...d, status:'pending'});
+  APP.stepIdx = APP.suites[APP.suiteIdx].steps.length - 1;
+  renderStepList(); renderEditor(); toast('Step added','✅');
+}
+
+function delStep(i) {
+  APP.suites[APP.suiteIdx].steps.splice(i,1);
+  APP.stepIdx = APP.suites[APP.suiteIdx].steps.length ? Math.min(APP.stepIdx||0, APP.suites[APP.suiteIdx].steps.length-1) : null;
+  renderStepList();
+  document.getElementById('bEditorBody').innerHTML = APP.stepIdx!==null ? '' : '<div class="empty"><div class="eic">👈</div>Select a step</div>';
+  if (APP.stepIdx!==null) renderEditor();
+  toast('Deleted','🗑');
+}
+
+function dupeStep(i) {
+  const c = {...APP.suites[APP.suiteIdx].steps[i], id:++APP.idCtr};
+  APP.suites[APP.suiteIdx].steps.splice(i+1,0,c);
+  APP.stepIdx = i+1; renderStepList(); renderEditor(); toast('Duplicated','⧉');
+}
+
+function saveSuite() {
+  Api.updateSuite(APP.suites[APP.suiteIdx].id, APP.suites[APP.suiteIdx]);
+  toast('Suite saved','💾');
+}
+
+// Drag & drop
+function dStart(e,i){APP.dragSrc=i;e.currentTarget.classList.add('dragging');}
+function dOver(e,i){e.preventDefault();document.querySelectorAll('.step-c').forEach(c=>c.classList.remove('dragover'));if(i!==APP.dragSrc)e.currentTarget.classList.add('dragover');}
+function dDrop(e,i){e.preventDefault();if(APP.dragSrc===null||APP.dragSrc===i)return;const[m]=APP.suites[APP.suiteIdx].steps.splice(APP.dragSrc,1);APP.suites[APP.suiteIdx].steps.splice(i,0,m);APP.stepIdx=i;renderStepList();}
+function dEnd(){APP.dragSrc=null;document.querySelectorAll('.step-c').forEach(c=>c.classList.remove('dragging','dragover'));}
+
+// Editor tab switching (no AI tab)
+document.querySelectorAll('.etab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.etab').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  APP.etab = t.dataset.etab;
+  if (APP.stepIdx!==null) renderEditor();
+  else if (APP.etab==='script') showScriptView();
+}));
+
+function renderEditor() {
+  if (APP.etab==='manual') renderManual();
+  else showScriptView();
+}
+
+function renderManual() {
+  const st = APP.suites[APP.suiteIdx].steps[APP.stepIdx];
+  if (!st) return;
+  const needsSel = !['navigate','screenshot','js','keyword'].includes(st.action);
+  const needsVal = st.action !== 'click' && st.action !== 'hover' && st.action !== 'keyword';
+
+  // Data binding options
+  let dataOpts = '<option value="">— bind from table…</option>';
+  APP.dataTables.forEach(t => t.cols.forEach(c => {
+    const ph = `{{${c}}}`;
+    dataOpts += `<option value="${ph}" ${st.value===ph?'selected':''}>${t.name} · ${c}</option>`;
+  }));
+
+  // Object link options
+  let objOpts = '<option value="">— none —</option>';
+  APP.objRepo.forEach(o => { objOpts += `<option value="${o.id}" ${st.objId==o.id?'selected':''}>${o.page} / ${o.name}</option>`; });
+
+  // Locator info from linked object
+  const obj = st.objId ? APP.objRepo.find(o=>o.id==st.objId) : null;
+
+  document.getElementById('bEditorBody').innerHTML = `
+    <div class="stl" style="margin-top:0">Step ${APP.stepIdx+1} — ${TAG_LBL[st.action]||st.action}</div>
+    <div class="frow">
+      <div class="ffield">
+        <label class="fl">Action</label>
+        <select class="fsel" id="eAction" onchange="updStAct()">
+          ${['navigate','click','fill','assert_text','wait','screenshot','hover','key','select','js','keyword'].map(a=>`<option value="${a}"${a===st.action?' selected':''}>${TAG_LBL[a]||a}</option>`).join('')}
+        </select>
+      </div>
+      <div class="ffield">
+        <label class="fl">Description</label>
+        <input class="fi" id="eDesc" value="${esc(st.desc)}" oninput="updSt('desc',this.value)">
+      </div>
+    </div>
+    ${st.action === 'keyword' ? (() => {
+      let libOpts = '<option value="">— select library…</option>';
+      APP.keywordLibs.forEach(l => { libOpts += '<option value="' + l.id + '"' + (st.kwLib==l.id?' selected':'') + '>' + l.pkg + '.' + l.name + '</option>'; });
+      const kwLib = APP.keywordLibs.find(l=>l.id==st.kwLib);
+      let kwOpts = '<option value="">— select keyword…</option>';
+      if (kwLib) kwLib.keywords.forEach(k => { kwOpts += '<option value="' + k.id + '"' + (st.kwId==k.id?' selected':'') + '>' + k.name + '()</option>'; });
+      const kw = kwLib ? kwLib.keywords.find(k=>k.id==st.kwId) : null;
+      return '<div class=\"stl\" style=\"margin-top:0\">Keyword Call</div>' +
+        '<div class=\"frow\"><div class=\"ffield\"><label class=\"fl\">Library Package</label>' +
+        '<select class=\"fsel\" onchange=\"updSt(\x27kwLib\x27,+this.value);updSt(\x27kwId\x27,null)\">'+libOpts+'</select></div>' +
+        '<div class=\"ffield\"><label class=\"fl\">Keyword Function</label>' +
+        '<select class=\"fsel\" onchange=\"updSt(\x27kwId\x27,+this.value);selStep(APP.stepIdx)\">'+kwOpts+'</select></div></div>' +
+        (kw ? '<div class=\"aibox\"><div class=\"ailbl\">' + kwLib.name + '.' + kw.name + '(' + kw.params.map(p=>p.name+': '+p.type).join(', ') + ') → ' + kw.returns + '</div>' +
+          '<div class=\"aitxt\">' + esc(kw.desc) + '</div>' +
+          '<pre style=\"background:var(--bg);border:1px solid var(--b2);border-radius:4px;padding:8px;font-size:10px;color:var(--t2);overflow-x:auto;margin-top:7px;white-space:pre-wrap\">' + esc(kw.body) + '</pre>' +
+          (kw.params.length ? '<div class=\"stl\">Parameters</div>' + kw.params.map((p,pi)=>'<div class=\"frow\"><div class=\"ffield\"><label class=\"fl\">' + p.name + ' (' + p.type + ')</label><input class=\"fi mono\" placeholder=\"value…\" value=\"\"' + ' oninput=\"updKwArg(' + pi + ',this.value)\"></div></div>').join('') : '') +
+          '<div style=\"margin-top:6px;display:flex;gap:5px\"><button class=\"btn bg bsm\" onclick=\"switchPage(\x27keywords\x27)\">📖 View Library</button></div></div>' : '') +
+        '<div class=\"stl\">Playwright Import</div>' +
+        '<div class=\"lrow\"><div class=\"ltype\">import</div><div class=\"lval\">' + (kwLib ? esc('{ ' + kwLib.name + ' } from \"./keywords/' + kwLib.name + '\"') : '— select a keyword above') + '</div></div>' +
+        '<div class=\"lrow\"><div class=\"ltype\">call</div><div class=\"lval\">' + (kw ? esc('const kw = new ' + kwLib.name + '(page);\nawait kw.' + kw.name + '(…)') : '—') + '</div></div>';
+    })() : ''}
+    ${needsSel ? `
+    <div class="ffield">
+      <label class="fl">Selector <span style="font-size:8px;background:var(--clo);color:var(--cyan);padding:1px 5px;border-radius:2px;margin-left:4px">or link an object →</span></label>
+      <div style="display:flex;gap:5px">
+        <input class="fi mono" style="flex:1" id="eSel" value="${esc(st.selector)}" placeholder='[data-testid="btn"]' oninput="updSt('selector',this.value)">
+        <button class="btn bg bsm" onclick="switchPage('inspector')">🔍</button>
+      </div>
+    </div>
+    <div class="ffield">
+      <label class="fl">🗄 Link Object Repository</label>
+      <select class="fsel" id="eObjLink" onchange="linkObj(this.value)">${objOpts}</select>
+    </div>` : ''}
+    ${needsVal ? `
+    <div class="ffield">
+      <label class="fl">${{navigate:'URL',assert_text:'Expected Text',wait:'Timeout ms',js:'JavaScript',key:'Key Name'}[st.action]||'Value'}</label>
+      <div style="display:flex;gap:5px">
+        <input class="fi mono" style="flex:1" id="eVal" value="${esc(st.value)}" placeholder="${st.action==='navigate'?'https://':'value...'}" oninput="updSt('value',this.value)">
+        ${APP.dataTables.length ? `<select class="fsel" style="width:155px" onchange="if(this.value){updSt('value',this.value);document.getElementById('eVal').value=this.value;this.value=''}">${dataOpts}</select>` : ''}
+      </div>
+      ${st.value&&st.value.startsWith('{{') ? `<div style="font-size:9px;color:var(--purple);margin-top:2px">⚡ Data binding: <strong>${esc(st.value)}</strong> resolved at runtime from table row</div>` : ''}
+    </div>` : ''}
+    ${needsSel ? `
+    <div class="stl">Locator Fingerprint</div>
+    <div class="hbox">
+      <div class="hnum">${obj?.healscore||94}</div>
+      <div><div style="font-weight:700;color:var(--green);font-size:12px">Healing Score</div>
+      <div style="font-size:10px;color:var(--t2)">${obj?`Linked: ${obj.name}`:'Manual selector · 4 fallbacks'}</div></div>
+    </div>
+    <div class="lrow"><div class="ltype">data-testid</div><div class="lval">${esc(st.selector||'[data-testid="element"]')}</div><div class="lbadge tc">★ Primary</div></div>
+    <div class="lrow"><div class="ltype">ARIA</div><div class="lval">${esc(obj?.aria||'[aria-label="..."]')}</div><div class="lbadge tg">Fallback 1</div></div>
+    <div class="lrow"><div class="ltype">CSS</div><div class="lval">${esc(obj?.css||'.parent > .element')}</div><div class="lbadge tt2">Fallback 2</div></div>
+    <div class="lrow"><div class="ltype">XPath</div><div class="lval">${esc(obj?.xpath||'//element[text()="..."]')}</div><div class="lbadge tt2">Fallback 3</div></div>` : ''}
+    <div class="stl">Options</div>
+    <div class="frow">
+      <div class="ffield"><label class="fl">Timeout (ms)</label><input class="fi mono" value="30000"></div>
+      <div class="ffield"><label class="fl">On Failure</label><select class="fsel"><option>Stop Suite</option><option>Continue</option><option>Retry 3×</option></select></div>
+    </div>
+    <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2);cursor:pointer">
+      <input type="checkbox" style="accent-color:var(--cyan)"> Screenshot after step
+    </label>`;
+}
+
+
+function updKwArg(paramIdx, val) {
+  if (APP.stepIdx===null) return;
+  const st = APP.suites[APP.suiteIdx].steps[APP.stepIdx];
+  if (!st.kwArgs) st.kwArgs = [];
+  st.kwArgs[paramIdx] = val;
+}
+function updSt(f,v) { if(APP.stepIdx===null)return; APP.suites[APP.suiteIdx].steps[APP.stepIdx][f]=v; renderStepList(); }
+function updStAct() {
+  const a = document.getElementById('eAction').value;
+  if (APP.stepIdx===null) return;
+  APP.suites[APP.suiteIdx].steps[APP.stepIdx].action = a;
+  renderStepList(); renderEditor();
+}
+function linkObj(objId) {
+  if (APP.stepIdx===null) return;
+  const st = APP.suites[APP.suiteIdx].steps[APP.stepIdx];
+  if (!objId) { st.objId=null; renderEditor(); return; }
+  const obj = APP.objRepo.find(o=>o.id===+objId);
+  if (!obj) return;
+  st.objId=+objId; st.selector=obj.sel;
+  Api.updateObject(obj.id, { linkedStep: APP.stepIdx });
+  renderStepList(); renderEditor(); toast(`Linked to "${obj.name}"`, '🔗');
+}
+
+function showScriptView() {
+  const s = APP.suites[APP.suiteIdx];
+  const lines = [`import { test, expect } from '@playwright/test';`, ``, `test.describe('${s.name}', () => {`, `  test('${s.name}', async ({ page }) => {`];
+
+  // Collect unique keyword libraries used in this suite
+  const usedLibs = [...new Set(s.steps.filter(st=>st.kwId).map(st=>APP.keywordLibs.find(l=>l.keywords.some(k=>k.id===st.kwId))).filter(Boolean).map(l=>l.name))];
+  usedLibs.forEach(libName => lines.push("import { " + libName + " } from './keywords/" + libName + "';"));
+  if (usedLibs.length) lines.push("");
+  s.steps.forEach(st => {
+    const sel = `'${st.selector}'`;
+    const valRaw = st.value && st.value.includes('{{') ? `data.${st.value.replace(/[{}]/g,'')}` : `'${st.value}'`;
+    switch (st.action) {
+      case 'navigate':     lines.push(`    await page.goto(${st.value.includes('{{')?valRaw:`'${st.value}'`});`); break;
+      case 'click':        lines.push(`    await page.click(${sel});`); break;
+      case 'fill':         lines.push(`    await page.fill(${sel}, ${valRaw});`); break;
+      case 'assert_text':  lines.push(`    await expect(page.locator(${sel})).toContainText(${valRaw});`); break;
+      case 'wait':         lines.push(`    await page.waitForSelector(${sel}, { timeout: ${+st.value||30000} });`); break;
+      case 'screenshot':   lines.push(`    await page.screenshot({ path: 'screenshots/${st.value}.png' });`); break;
+      case 'hover':        lines.push(`    await page.hover(${sel});`); break;
+      case 'key':          lines.push(`    await page.keyboard.press('${st.value||"Enter"}');`); break;
+      case 'select':       lines.push(`    await page.selectOption(${sel}, ${valRaw});`); break;
+      case 'js':           lines.push(`    await page.evaluate(() => { ${st.value} });`); break;
+      case 'keyword': {
+        const kwlib2 = APP.keywordLibs.find(l=>l.keywords.some(k=>k.id===st.kwId));
+        const kw2 = kwlib2 ? kwlib2.keywords.find(k=>k.id===st.kwId) : null;
+        if (kw2) {
+          const args2 = (st.kwArgs||kw2.params.map(()=>"''")).map(a=>typeof a==='string'?JSON.stringify(a):a).join(', ');
+          lines.push('    await kw.' + kw2.name + '(' + args2 + '); // ' + kwlib2.name);
+        } else { lines.push('    // [keyword — select a function above]'); }
+        break; }
+    }
+  });
+  lines.push(`  });`, `});`);
+  const code = lines.join('\n');
+  window._scriptCode = code;
+  const hl = esc(code).replace(/(import|from|const|await|async|test|expect|describe)/g,'<span style="color:var(--purple)">$1</span>').replace(/('[^']*')/g,'<span style="color:var(--green)">$1</span>').replace(/(\/\/.*)/g,'<span style="color:var(--t3)">$1</span>').replace(/\bpage\b/g,'<span style="color:var(--cyan)">page</span>');
+  document.getElementById('bEditorBody').innerHTML = `
+    <div class="stl" style="margin-top:0">Generated Playwright Script</div>
+    <div style="background:var(--bg);border:1px solid var(--b2);border-radius:5px;padding:10px;font-family:var(--fm);font-size:11px;line-height:1.7;overflow-x:auto;white-space:pre;color:var(--t2)">${hl}</div>
+    <div style="display:flex;gap:5px;margin-top:8px">
+      <button class="btn bg bsm" onclick="navigator.clipboard?.writeText(window._scriptCode);toast('Copied','📋')">📋 Copy</button>
+      <button class="btn bg bsm" onclick="dlScript()">💾 Download</button>
+    </div>`;
+}
+
+function dlScript() {
+  const s = APP.suites[APP.suiteIdx];
+  const b = new Blob([window._scriptCode||''], {type:'text/plain'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(b);
+  a.download = s.name.replace(/\s+/g,'-').toLowerCase()+'.spec.ts'; a.click();
+  toast('Downloaded','💾');
+}
+
+// Quick Reference Panel
+function renderQuickRef() {
+  const oEl = document.getElementById('bObjRef');
+  if (!APP.objRepo.length) { oEl.innerHTML='<div style="color:var(--t3);font-size:11px;text-align:center;padding:12px">No objects yet<br><button class="btn bg bsm" style="margin-top:6px" onclick="showModal(\'newObjModal\')">+ Add</button></div>'; }
+  else oEl.innerHTML = APP.objRepo.map(o=>`<div class="dr-item" onclick="insertObj(${o.id})" title="Click to apply to selected step"><div class="dr-name">${esc(o.name)}</div><div class="dr-sel">${esc(o.sel)}</div><div class="dr-meta">${esc(o.page)} · score: <span style="color:var(--green)">${o.healscore}</span></div></div>`).join('');
+
+  const dEl = document.getElementById('bDataRef');
+  if (!APP.dataTables.length) { dEl.innerHTML='<div style="color:var(--t3);font-size:11px;text-align:center;padding:12px">No tables yet<br><button class="btn bg bsm" style="margin-top:6px" onclick="switchPage(\'datatables\')">+ Create</button></div>'; return; }
+  let html = '';
+  APP.dataTables.forEach(t => {
+    html += `<div style="font-size:9px;font-weight:700;color:var(--t3);letter-spacing:.6px;text-transform:uppercase;margin:6px 0 3px">${esc(t.name)}</div>`;
+    t.cols.forEach(c => {
+      const sample = t.rows[0]?.[t.cols.indexOf(c)] || '(empty)';
+      html += `<div class="dr-item" onclick="insertData('{{${c}}}')" title="Bind {{${c}}}"><div class="dr-name">{{${c}}}</div><div class="dr-sel">${esc(sample)}</div><div class="dr-meta">Sample · row 1</div></div>`;
+    });
+  });
+  dEl.innerHTML = html;
+}
+
+function insertObj(objId) {
+  if (APP.stepIdx===null) { toast('Select a step first','⚠️'); return; }
+  const obj = APP.objRepo.find(o=>o.id===objId);
+  if (!obj) return;
+  const st = APP.suites[APP.suiteIdx].steps[APP.stepIdx];
+  st.selector=obj.sel; st.objId=obj.id;
+  renderStepList(); renderEditor(); toast(`"${obj.name}" applied`,'🗄');
+}
+function insertData(ph) {
+  if (APP.stepIdx===null) { toast('Select a step first','⚠️'); return; }
+  const st = APP.suites[APP.suiteIdx].steps[APP.stepIdx];
+  st.value=ph; st.dataKey=ph.replace(/[{}]/g,'');
+  renderStepList(); renderEditor(); toast(`Bound ${ph}`,'📋');
+}
+
+function createSuite() {
+  const name = document.getElementById('nsSuiteName').value.trim();
+  if (!name) { toast('Name required','⚠️'); return; }
+  const s = {id:APP.suites.length, name, url:document.getElementById('nsBaseUrl').value||'https://example.com', browser:document.getElementById('nsBrowser').value, steps:[]};
+  APP.suites.push(s);
+  ['bSuiteSelect','rSuiteSelect'].forEach(id=>{const sel=document.getElementById(id);if(sel){const o=document.createElement('option');o.value=s.id;o.textContent=s.name;sel.appendChild(o);}});
+  Api.createSuite(s);
+  hideModal('newSuiteModal');
+  document.getElementById('bSuiteSelect').value = s.id;
+  loadSuite(s.id); switchPage('builder');
+  toast(`"${name}" created`,'✅');
+}
+
+// ════════════════════════════════════════════════════════
+//  LIVE INSPECTOR
+// ════════════════════════════════════════════════════════
+let frameHistory=[], frameHistIdx=-1, currentUrl='';
+
+function navigateTo(raw) {
+  let url = raw.trim();
+  if (!url) return;
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  currentUrl = url;
+  document.getElementById('urlInput').value = url.replace(/^https?:\/\//,'');
+  document.getElementById('urlProto').textContent = url.startsWith('https')?'https://':'http://';
+  document.getElementById('sslIc').textContent = url.startsWith('https')?'🔒':'⚠';
+  document.getElementById('corsNotice').style.display = 'none';
+  document.getElementById('liveFrame').src = url;
+  frameHistory = frameHistory.slice(0, frameHistIdx+1);
+  frameHistory.push(url); frameHistIdx = frameHistory.length-1;
+  Api.validateSelector({ url });
+  toast('Loading ' + url.replace(/^https?:\/\//,'').slice(0,32)+'…','🌐');
+  setTimeout(() => {
+    try {
+      const d = document.getElementById('liveFrame').contentDocument;
+      if (!d || d.URL==='about:blank') document.getElementById('corsNotice').style.display='flex';
+    } catch(e) { document.getElementById('corsNotice').style.display='flex'; }
+  }, 3500);
+}
+function iframeBack()    { if(frameHistIdx>0){frameHistIdx--;const u=frameHistory[frameHistIdx];document.getElementById('urlInput').value=u.replace(/^https?:\/\//,'');document.getElementById('liveFrame').src=u;}}
+function iframeForward() { if(frameHistIdx<frameHistory.length-1){frameHistIdx++;const u=frameHistory[frameHistIdx];document.getElementById('urlInput').value=u.replace(/^https?:\/\//,'');document.getElementById('liveFrame').src=u;}}
+function reloadFrame()   { document.getElementById('liveFrame').src=document.getElementById('liveFrame').src; }
+function setZoom(v)      { const f=document.getElementById('liveFrame');f.style.transform=`scale(${v})`;f.style.transformOrigin='top left';f.style.width=(100/v)+'%';f.style.height=(100/v)+'%'; }
+
+function togglePick() {
+  APP.pickMode = !APP.pickMode;
+  const ov = document.getElementById('iframeOv');
+  const btn = document.getElementById('pickBtn');
+  const banner = document.getElementById('pickBanner');
+  ov.classList.toggle('active', APP.pickMode);
+  btn.textContent = `🎯 Pick: ${APP.pickMode?'ON':'OFF'}`;
+  btn.className = `btn bsm ${APP.pickMode?'bp':'bg'}`;
+  banner.classList.toggle('hidden', !APP.pickMode);
+  if (APP.pickMode) toast('Click any element to capture its selectors','🎯');
+}
+
+function handleOverlayClick(e) {
+  if (!APP.pickMode) return;
+  const frame = document.getElementById('liveFrame');
+  const rect = frame.getBoundingClientRect();
+  try {
+    const doc = frame.contentDocument || frame.contentWindow.document;
+    const el = doc.elementFromPoint(e.clientX-rect.left, e.clientY-rect.top);
+    if (el) captureElement(el);
+  } catch(err) { showManualCapture(); }
+}
+
+function captureElement(el) {
+  const tag=el.tagName.toLowerCase(), id=el.id||'', testid=el.getAttribute('data-testid')||'',
+        cls=Array.from(el.classList).slice(0,3).join(' ')||'',
+        ariaLabel=el.getAttribute('aria-label')||'',
+        placeholder=el.getAttribute('placeholder')||'',
+        txt=(el.textContent||'').trim().slice(0,30),
+        role=el.getAttribute('role')||'', visible=el.offsetParent!==null;
+  APP.capturedEl = {tag,id,testid,cls,ariaLabel,placeholder,txt,role,visible};
+  const dispName = testid||ariaLabel||txt||id||tag;
+  document.getElementById('capName').textContent = dispName||'Element';
+  const attrs = [['tagName',tag],['id',id||'(none)'],['data-testid',testid||'(none)'],['class',cls||'(none)'],['aria-label',ariaLabel||'(none)'],['role',role||'(none)'],['placeholder',placeholder||'(none)'],['text',txt||'(none)'],['visible',visible?'true':'false']];
+  document.getElementById('capAttrs').innerHTML = attrs.map(([k,v])=>`<div class="attr-r"><span class="ak">${k}</span><span class="av ${v==='true'?'grn':''}">${esc(v)}</span></div>`).join('');
+  const locs=[];
+  if(testid) locs.push({type:'data-testid',val:`[data-testid="${testid}"]`,pri:true});
+  if(id)     locs.push({type:'ID',val:`#${id}`,pri:!locs.length});
+  if(ariaLabel) locs.push({type:'ARIA',val:`[aria-label="${ariaLabel}"]`,pri:!locs.length});
+  if(cls)    locs.push({type:'CSS',val:`.${cls.split(' ')[0]}`,pri:!locs.length});
+  locs.push({type:'XPath',val:ariaLabel?`//${tag}[@aria-label="${ariaLabel}"]`:txt?`//${tag}[text()="${txt}"]`:`//${tag}`});
+  const score = testid?97:id?88:ariaLabel?82:72;
+  document.getElementById('capLocs').innerHTML = `<div class="hbox"><div class="hnum">${score}</div><div><div style="font-weight:700;color:var(--green);font-size:12px">Stability Score</div><div style="font-size:10px;color:var(--t2)">${locs.length} locators · ${score>90?'excellent':score>80?'good':'fair'}</div></div></div>${locs.map(l=>`<div class="lrow"><div class="ltype">${l.type}</div><div class="lval">${esc(l.val)}</div>${l.pri?'<div class="lbadge tc">★ Primary</div>':''}</div>`).join('')}`;
+  document.getElementById('capAI').innerHTML = `<div class="aibox"><div class="ailbl">Recommendation</div><div class="aitxt">${testid?`<code>data-testid="${testid}"</code> detected — highly stable. Use as primary locator.`:ariaLabel?`<code>aria-label="${ariaLabel}"</code> is a solid fallback. Add <code>data-testid</code> for best stability.`:`No stable ID found. Ask the dev team to add <code>data-testid</code> to this element.`}</div></div>`;
+  document.getElementById('capActs').style.display = 'block';
+  Api.validateSelector({ selector: locs[0]?.val });
+}
+
+function showManualCapture() {
+  document.getElementById('capName').textContent = 'Manual Entry';
+  document.getElementById('capAttrs').innerHTML = `<div class="aibox" style="border-color:rgba(255,209,102,.2);background:var(--ylo)"><div class="ailbl" style="color:var(--yellow)">⚠ Cross-Origin</div><div class="aitxt">This site blocks frame inspection. Open DevTools (F12), right-click an element → "Copy selector", then paste below.</div></div><div class="ffield" style="margin-top:8px"><label class="fl">Paste Selector</label><input class="fi mono" id="manualSel" placeholder='[data-testid="btn"]' oninput="handleManualSel(this.value)"></div><div class="ffield"><label class="fl">Element Name</label><input class="fi" id="manualName" placeholder="e.g. Submit Button"></div>`;
+  document.getElementById('capLocs').innerHTML='';
+  document.getElementById('capActs').style.display='block';
+}
+
+function handleManualSel(sel) {
+  if (!sel) return;
+  APP.capturedEl = {tag:'unknown',testid:sel.match(/data-testid="([^"]+)"/)?.[1]||'',ariaLabel:'',txt:'',visible:true,manualSel:sel};
+  document.getElementById('capLocs').innerHTML = `<div class="lrow"><div class="ltype">Selector</div><div class="lval">${esc(sel)}</div><div class="lbadge tc">★ Primary</div></div>`;
+  document.getElementById('capAI').innerHTML = `<div class="aibox"><div class="ailbl">Tip</div><div class="aitxt">Save to the Object Repository for reuse and self-healing across all suites.</div></div>`;
+}
+
+function getPrimary() {
+  if (!APP.capturedEl) return '';
+  const el = APP.capturedEl;
+  return el.manualSel || (el.testid?`[data-testid="${el.testid}"]`:el.id?`#${el.id}`:el.ariaLabel?`[aria-label="${el.ariaLabel}"]`:'');
+}
+
+function copyCapSel() { navigator.clipboard?.writeText(getPrimary()).catch(()=>{}); toast('Selector copied','📋'); }
+
+function addCapturedToRepo() {
+  if (!APP.capturedEl) { toast('Capture an element first','⚠️'); return; }
+  const el = APP.capturedEl;
+  const name = document.getElementById('manualName')?.value || el.testid || el.ariaLabel || el.txt || 'Element';
+  const sel  = getPrimary();
+  const score = el.testid?97:el.id?88:72;
+  const xpathVal2 = el.tag ? ('//' + el.tag + (el.txt ? '[text()="' + el.txt + '"]' : '')) : '';
+  const ariaVal2 = el.ariaLabel ? ('[aria-label="' + el.ariaLabel + '"]') : '';
+  const cssVal2 = el.cls ? ('.' + el.cls.split(' ')[0]) : '';
+  const obj = {id:++APP.idCtr, name, page:currentUrl.replace(/^https?:\/\//,'').split('/')[0]||'Captured', sel, aria:ariaVal2, css:cssVal2, xpath:xpathVal2, healscore:score, uses:0};
+  APP.objRepo.push(obj);
+  Api.createObject(obj);
+  updateCounts(); renderQuickRef();
+  toast(`"${name}" saved to Objects`,'💾');
+}
+
+function addCapturedToStep() {
+  if (!APP.capturedEl) { toast('Capture an element first','⚠️'); return; }
+  const el = APP.capturedEl;
+  const sel = getPrimary();
+  APP.suites[APP.suiteIdx].steps.push({id:++APP.idCtr, action:'click', desc:`Click ${el.testid||el.ariaLabel||el.txt||'element'}`, selector:sel, value:'', status:'pending'});
+  toast('Step added to '+APP.suites[APP.suiteIdx].name,'✅');
+  switchPage('builder');
+}
+
+// ════════════════════════════════════════════════════════
+//  OBJECT REPOSITORY
+// ════════════════════════════════════════════════════════
+function renderObjRepo() {
+  const search = (document.getElementById('orSearch')?.value||'').toLowerCase();
+  const filtered = APP.objRepo.filter(o=>!search||o.name.toLowerCase().includes(search)||o.page.toLowerCase().includes(search)||o.sel.toLowerCase().includes(search));
+  document.getElementById('orCount').textContent  = filtered.length+'/'+APP.objRepo.length;
+  document.getElementById('orSub').textContent    = `${APP.objRepo.length} objects · ${[...new Set(APP.objRepo.map(o=>o.page))].length} pages`;
+  const el = document.getElementById('orItems');
+  if (!filtered.length) { el.innerHTML='<div class="empty"><div class="eic">🗄</div>No objects yet<br><button class="btn bp bsm" style="margin-top:8px" onclick="showModal(\'newObjModal\')">+ Add</button></div>'; return; }
+  el.innerHTML = filtered.map(o=>`<div class="or-item${APP.selObjIdx===o.id?' sel':''}" onclick="selObj(${o.id})"><div class="or-iname">${esc(o.name)}</div><div class="or-isel">${esc(o.sel)}</div><div class="or-itag">${esc(o.page)} · used ${o.uses}×<span class="badge bpass" style="margin-left:6px">score ${o.healscore}</span></div></div>`).join('');
+  updateCounts();
+}
+
+function filterObjects() { renderObjRepo(); }
+
+function selObj(id) {
+  APP.selObjIdx = id; renderObjRepo();
+  const o = APP.objRepo.find(x=>x.id===id);
+  if (!o) return;
+  const detail = document.getElementById('orDetail');
+  const linked = APP.suites.flatMap(s=>s.steps.filter(st=>st.objId===o.id).map(st=>({suite:s.name,step:st})));
+  detail.innerHTML = `
+    <div style="padding:8px 14px;border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:7px;background:var(--bg2);flex-shrink:0">
+      <div style="font-family:var(--fd);font-size:14px;font-weight:700;color:var(--t1)">${esc(o.name)}</div>
+      <span class="badge bq">${esc(o.page)}</span>
+      <div style="margin-left:auto;display:flex;gap:5px">
+        <button class="btn bg bsm" onclick="deleteObj(${o.id})">🗑</button>
+        <button class="btn bp bsm" onclick="insertObj(${o.id});switchPage('builder')">+ Use in Step</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:14px">
+      <div class="stl" style="margin-top:0">Healing Resilience</div>
+      <div class="heal-meter">
+        <div class="hm-num">${o.healscore}</div>
+        <div><div style="font-weight:700;color:var(--green);font-size:12px">Stability Score</div>
+        <div style="font-size:10px;color:var(--t2)">${o.healscore>=90?'Excellent — data-testid present':o.healscore>=80?'Good — stable identifiers':o.healscore>=70?'Fair — consider adding data-testid':'Weak — update selectors'}</div></div>
+      </div>
+      <div class="stl">Locators (click to edit)</div>
+      <div class="locrow"><div class="locrow-type">data-testid</div><input value="${esc(o.sel)}" oninput="updObj(${o.id},'sel',this.value)"><span style="font-size:9px;color:var(--green)">★</span></div>
+      <div class="locrow"><div class="locrow-type">ARIA</div><input value="${esc(o.aria)}" oninput="updObj(${o.id},'aria',this.value)"></div>
+      <div class="locrow"><div class="locrow-type">CSS</div><input value="${esc(o.css)}" oninput="updObj(${o.id},'css',this.value)"></div>
+      <div class="locrow"><div class="locrow-type">XPath</div><input value="${esc(o.xpath)}" oninput="updObj(${o.id},'xpath',this.value)"></div>
+      <div class="stl">Linked Steps (${linked.length})</div>
+      ${linked.length ? linked.map(l=>`<div style="display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:4px;background:var(--bg3);border:1px solid var(--b2);margin-bottom:3px;font-size:11px"><span class="stag ${TAG_CLS[l.step.action]||'twat'}">${TAG_LBL[l.step.action]||l.step.action}</span><span style="color:var(--t2)">${esc(l.step.desc)}</span><span style="color:var(--t3);margin-left:auto;font-size:10px">${esc(l.suite)}</span></div>`).join('') : '<div style="color:var(--t3);font-size:11px">Not linked to any steps yet</div>'}
+    </div>`;
+  detail.style.cssText='display:flex;flex-direction:column;overflow:hidden;flex:1';
+}
+
+function updObj(id,f,v) { const o=APP.objRepo.find(x=>x.id===id); if(o){o[f]=v; Api.updateObject(id,{[f]:v});} }
+function deleteObj(id) {
+  APP.objRepo=APP.objRepo.filter(o=>o.id!==id); APP.selObjIdx=null;
+  Api.deleteObject(id);
+  renderObjRepo();
+  document.getElementById('orDetail').innerHTML='<div class="empty"><div class="eic">🗄</div>Select an object</div>';
+  updateCounts(); toast('Deleted','🗑');
+}
+function createObject() {
+  const name=document.getElementById('noName').value.trim(), sel=document.getElementById('noSel').value.trim();
+  if(!name||!sel){toast('Name and selector required','⚠️');return;}
+  const score=sel.includes('data-testid')?97:sel.startsWith('#')?85:sel.includes('aria-label')?82:70;
+  const obj={id:++APP.idCtr,name,page:document.getElementById('noPage').value.trim()||'General',sel,aria:document.getElementById('noAria').value.trim(),css:document.getElementById('noCss').value.trim(),xpath:document.getElementById('noXpath').value.trim(),healscore:score,uses:0};
+  APP.objRepo.push(obj);
+  Api.createObject(obj);
+  hideModal('newObjModal'); renderObjRepo(); renderQuickRef(); updateCounts();
+  toast(`"${name}" added`,'🗄');
+}
+
+// ════════════════════════════════════════════════════════
+//  DATA TABLES
+// ════════════════════════════════════════════════════════
+function renderDataTables() {
+  const list=document.getElementById('dtList');
+  document.getElementById('dtCount').textContent=APP.dataTables.length;
+  document.getElementById('dtSub').textContent=`${APP.dataTables.length} table${APP.dataTables.length!==1?'s':''} · ${APP.dataTables.reduce((s,t)=>s+t.rows.length,0)} rows total`;
+  if(!APP.dataTables.length){list.innerHTML='<div class="empty"><div class="eic">📋</div>No tables<br><button class="btn bp bsm" style="margin-top:8px" onclick="showModal(\'newTableModal\')">+ Create</button></div>';return;}
+  list.innerHTML=APP.dataTables.map((t,i)=>`<div class="dt-titem${APP.selTableIdx===i?' sel':''}" onclick="selTable(${i})"><div class="dt-tname">${esc(t.name)}</div><div class="dt-tmeta">${t.cols.length} cols · ${t.rows.length} rows</div></div>`).join('');
+  updateCounts();
+  if(APP.selTableIdx!==null) renderGrid(APP.selTableIdx);
+  else if(APP.dataTables.length) selTable(0);
+}
+
+function selTable(i) { APP.selTableIdx=i; renderDataTables(); renderGrid(i); }
+
+function renderGrid(i) {
+  const t=APP.dataTables[i];
+  const ed=document.getElementById('dtEditor');
+  ed.innerHTML=`
+    <div class="dt-ehead">
+      <span style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--t1)">${esc(t.name)}</span>
+      <span class="badge bq">${t.rows.length} rows</span>
+      <span style="font-size:10px;color:var(--t3)">${esc(t.desc)}</span>
+      <div style="margin-left:auto;display:flex;gap:5px">
+        <button class="btn bg bsm" onclick="addRow(${i})">+ Row</button>
+        <button class="btn bg bsm" onclick="addCol(${i})">+ Col</button>
+        <button class="btn bg bsm" onclick="expCSV(${i})">📤 CSV</button>
+        <button class="btn bd bsm" onclick="delTable(${i})">🗑</button>
+      </div>
+    </div>
+    <div class="dt-grid-wrap">
+      <table class="dt-grid">
+        <thead><tr>
+          <th style="width:36px">#</th>
+          ${t.cols.map((c,ci)=>`<th ondblclick="renCol(${i},${ci})" title="Dbl-click to rename">${esc(c)}</th>`).join('')}
+          <th class="add-col" onclick="addCol(${i})" style="cursor:pointer;text-align:center" title="Add column">+</th>
+          <th style="width:30px;background:var(--bg2)"></th>
+        </tr></thead>
+        <tbody>
+          ${t.rows.map((row,ri)=>`<tr>
+            <td class="rn">${ri+1}</td>
+            ${t.cols.map((c,ci)=>`<td><input value="${esc(row[ci]||'')}" onchange="updCell(${i},${ri},${ci},this.value)" placeholder="…"></td>`).join('')}
+            <td class="add-col" onclick="addCol(${i})"></td>
+            <td class="rn" style="color:var(--red);cursor:pointer" onclick="delRow(${i},${ri})" title="Delete row">✕</td>
+          </tr>`).join('')}
+          <tr style="cursor:pointer" onclick="addRow(${i})">
+            <td class="rn" style="color:var(--cyan)">+</td>
+            ${t.cols.map(()=>`<td><div style="font-size:10px;color:var(--t3);padding:5px 9px">Add row…</div></td>`).join('')}
+            <td></td><td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="padding:6px 12px;border-top:1px solid var(--b2);font-size:10px;color:var(--t3);display:flex;gap:14px;flex-shrink:0;background:var(--bg2)">
+      <span>💡 Use <code>{{${t.cols[0]||'col'}}}</code> in test step values to bind this data at runtime</span>
+      <span style="margin-left:auto">${t.rows.length} × ${t.cols.length}</span>
+    </div>`;
+  ed.style.cssText='display:flex;flex-direction:column;overflow:hidden;flex:1';
+}
+
+function updCell(ti,ri,ci,v){APP.dataTables[ti].rows[ri][ci]=v; Api.updateTable(APP.dataTables[ti].id,APP.dataTables[ti]);}
+function addRow(i){APP.dataTables[i].rows.push(APP.dataTables[i].cols.map(()=>'')); renderGrid(i); renderDataTables();}
+function delRow(ti,ri){APP.dataTables[ti].rows.splice(ri,1); Api.updateTable(APP.dataTables[ti].id,APP.dataTables[ti]); renderGrid(ti); renderDataTables();}
+function addCol(i){const n=prompt('Column name:','new_col');if(!n)return;APP.dataTables[i].cols.push(n.trim());APP.dataTables[i].rows.forEach(r=>r.push(''));renderGrid(i);renderDataTables();updateCounts();toast('Column added','📋');}
+function renCol(ti,ci){const t=APP.dataTables[ti];const n=prompt('Rename column:',t.cols[ci]);if(!n)return;t.cols[ci]=n.trim();renderGrid(ti);}
+function delTable(i){if(!confirm('Delete this table?'))return; Api.deleteTable(APP.dataTables[i].id); APP.dataTables.splice(i,1);APP.selTableIdx=null;renderDataTables();updateCounts();toast('Deleted','🗑');}
+function createTable(){
+  const name=document.getElementById('ntName').value.trim();
+  if(!name){toast('Name required','⚠️');return;}
+  const cols=document.getElementById('ntCols').value.split(',').map(c=>c.trim()).filter(Boolean);
+  if(!cols.length){toast('Add at least one column','⚠️');return;}
+  const t={id:++APP.idCtr,name,desc:document.getElementById('ntDesc').value.trim(),cols,rows:[cols.map(()=>'')]};
+  APP.dataTables.push(t);
+  Api.createTable(t);
+  hideModal('newTableModal'); renderDataTables(); renderQuickRef(); updateCounts();
+  toast(`"${name}" created`,'📋');
+}
+function expCSV(i){
+  if(i===undefined)i=APP.selTableIdx; if(i===null||i===undefined){toast('Select a table','⚠️');return;}
+  const t=APP.dataTables[i];
+  const csv=[t.cols.join(','),...t.rows.map(r=>r.map(v=>`"${v}"`).join(','))].join('\n');
+  const b=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=t.name+'.csv';a.click();toast('Exported '+t.name+'.csv','📤');
+}
+function impCSV(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='.csv';
+  inp.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const lines=ev.target.result.trim().split('\n');if(lines.length<1)return;const cols=lines[0].split(',').map(c=>c.trim().replace(/"/g,''));const rows=lines.slice(1).map(l=>l.split(',').map(v=>v.trim().replace(/"/g,'')));const t={id:++APP.idCtr,name:f.name.replace('.csv',''),desc:'Imported',cols,rows};APP.dataTables.push(t);Api.createTable(t);renderDataTables();updateCounts();toast(`Imported "${t.name}" (${rows.length} rows)`,'📥');};r.readAsText(f);};
+  inp.click();
+}
+
+// ════════════════════════════════════════════════════════
+//  RUNNER
+// ════════════════════════════════════════════════════════
+let runStart=0;
+
+function syncRunnerUI() {
+  const rSel=document.getElementById('rSuiteSelect');
+  if(rSel){rSel.innerHTML=APP.suites.map((s,i)=>`<option value="${i}">${s.name}</option>`).join(''); rSel.value=APP.suiteIdx;}
+  const dSel=document.getElementById('rDataSelect');
+  if(dSel)dSel.innerHTML='<option value="">None (use hardcoded values)</option>'+APP.dataTables.map((t,i)=>`<option value="${i}">${t.name} (${t.rows.length} rows)</option>`).join('');
+}
+
+function selBrowser(el,b){APP.browser=b;document.querySelectorAll('.bpill').forEach(p=>p.classList.remove('active'));el.classList.add('active');}
+
+function clearLog(){document.getElementById('logStream').innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:7px;color:var(--t3)"><div style="font-size:24px;opacity:.3">▶</div><div style="font-size:11px">Log cleared</div></div>';}
+
+function runCurrentSuite() {
+  const idx=parseInt(document.getElementById('rSuiteSelect')?.value??APP.suiteIdx);
+  APP.suiteIdx=idx;
+  switchPage('runner');
+  document.getElementById('rSuiteSelect').value=idx;
+  setTimeout(()=>execRun(idx), 120);
+}
+
+async function execRun(suiteIdx) {
+  if(APP.isRunning)return;
+  APP.isRunning=true;
+  const suite=APP.suites[suiteIdx];
+  const speed=parseInt(document.getElementById('rSpeed')?.value||350);
+  const dtIdx=document.getElementById('rDataSelect')?.value;
+  const dataTable=dtIdx!==''&&dtIdx!==undefined?APP.dataTables[+dtIdx]:null;
+  const dataRow=dataTable?.rows[0]||null;
+  suite.steps.forEach(s=>s.status='pending');
+  if(APP.page==='builder')renderStepList();
+
+  // API call to start run
+  const runRes = await Api.runSuite(suite.id, { browser:APP.browser, headless:document.getElementById('rHeadless')?.checked, dataTableId:dataTable?.id });
+
+  document.getElementById('logStream').innerHTML='';
+  ['lfPass','lfFail','lfHeal'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='0';});
+  document.getElementById('lfData').textContent=dataRow?`${dataTable.name} · Row 1`:'—';
+  document.getElementById('lfTime').textContent='0.0s';
+  document.getElementById('rStopBtn').disabled=false;
+  document.getElementById('rPulse').className='puls';
+  document.getElementById('logPulse').className='puls';
+  document.getElementById('wsStatus').textContent='● connected';
+  document.getElementById('rStatusTxt').textContent=`Running ${suite.name}`;
+  document.getElementById('rSub').textContent=`${suite.name} · ${APP.browser} · ${APP.envs[APP.envIdx]}`;
+
+  let passed=0,failed=0,heals=0;
+  runStart=Date.now();
+  APP.runTimer=setInterval(()=>{const e=document.getElementById('lfTime');if(e)e.textContent=((Date.now()-runStart)/1000).toFixed(1)+'s';},100);
+  renderStepProg(suite,-1);
+  addLog('INFO',`▶ Suite: ${suite.name} · runId: ${runRes.data?.runId||'mock'}`);
+  addLog('API', `POST /suites/${suite.id}/run → 202 Accepted`);
+  addLog('INFO',`Browser: ${APP.browser} · Headless: ${document.getElementById('rHeadless')?.checked}`);
+  if(dataRow&&dataTable) addLog('DATA',`📋 Bound: ${dataTable.cols.map((c,i)=>`${c}="${dataRow[i]}"`).join(', ')}`);
+  await wait(speed*0.5||200);
+
+  for(let i=0;i<suite.steps.length;i++){
+    if(!APP.isRunning)break;
+    const st=suite.steps[i];
+    renderStepProg(suite,i); updateBM(st,'run');
+    let dispVal=st.value;
+    if(dataRow&&dataTable&&st.value?.includes('{{')){const key=st.value.replace(/[{}]/g,'');const ci=dataTable.cols.indexOf(key);if(ci>=0){dispVal=dataRow[ci];addLog('DATA',`⚡ {{${key}}} → "${dispVal}"`);}};
+    addLog('STEP',`→ [${i+1}/${suite.steps.length}] ${st.action==='keyword'?'KW ['+(() => { const kwl=APP.keywordLibs.find(l=>l.keywords.some(k=>k.id===st.kwId)); const kw=kwl?.keywords.find(k=>k.id===st.kwId); return kwl?kwl.name+'.'+kw?.name:'unknown'; })() +']':TAG_LBL[st.action]||st.action}: ${st.desc}${dispVal&&dispVal!==st.value?` → "${dispVal}"`:''}`)
+    await wait(speed+Math.random()*120);
+    const healChance=st.selector&&st.selector.startsWith('.')?0.15:0.04;
+    const failChance=suiteIdx===1&&i===7?0.6:0.05;
+    const r=Math.random();
+    if(r<healChance&&st.selector){
+      heals++;APP.totalHeals++;
+      addLog('HEAL',`⚡ Primary locator failed`);
+      await wait(speed*0.4);
+      const healRes=await Api.healSelector({selector:st.selector,fallback:'[aria-label]'});
+      addLog('HEAL',`✔ Healed → ${healRes.data?.newSelector||'[aria-label]'}`);
+      addLog('API',`POST /heal → 200 · new: ${healRes.data?.newSelector||'[aria-label]'}`);
+      document.getElementById('lfHeal').textContent=heals;
+      document.getElementById('sbHealCnt').textContent=APP.totalHeals;
+      st.status='pass';passed++;
+    } else if(r<failChance+healChance){
+      st.status='fail';failed++;
+      addLog('FAIL',`✗ Step ${i+1} FAILED · selector not found`);
+      renderStepProg(suite,i,'fail'); updateBM(st,'fail');
+      addLog('INFO',`Suite stopped at step ${i+1}`); break;
+    } else {
+      st.status='pass';passed++;
+      const ms=(80+Math.random()*500).toFixed(0);
+      addLog('PASS',`✓ Step ${i+1} passed · ${ms}ms`);
+    }
+    document.getElementById('lfPass').textContent=passed;
+    document.getElementById('lfFail').textContent=failed;
+    renderStepProg(suite,i);
+    if(APP.page==='builder')renderStepList();
+    await wait(speed*0.25);
+  }
+
+  const dur=((Date.now()-runStart)/1000).toFixed(1);
+  clearInterval(APP.runTimer);
+
+  // Fetch results from API
+  const results = await Api.getRunResults(runRes.data?.runId||'mock');
+  addLog('API',`GET /runs/${runRes.data?.runId||'mock'}/results → 200`);
+
+  const rec={id:APP.runHistory.length+1,suite:suite.name,status:failed?'fail':'pass',passed,failed,healed:heals,duration:dur,browser:APP.browser,dataTable:dataTable?.name||null,timestamp:new Date()};
+  APP.runHistory.push(rec);
+  addLog('INFO','─────────────────────');
+  addLog(failed?'FAIL':'PASS',failed?`Suite FAILED · ${passed}✓ ${failed}✗ · ${dur}s`:`Suite PASSED · All ${passed} steps · ${dur}s`);
+  document.getElementById('rPulse').className=failed?'puls r':'puls off';
+  document.getElementById('logPulse').className='puls off';
+  document.getElementById('rStatusTxt').textContent=failed?'Failed':'Passed';
+  document.getElementById('rStopBtn').disabled=true;
+  document.getElementById('wsStatus').textContent='● idle';
+  APP.isRunning=false;
+  addActivity(rec); refreshDashboard(); updateCounts();
+  toast(failed?`Failed: ${failed} step(s)`:`Passed: All ${passed} steps ✓`, failed?'❌':'✅');
+}
+
+function stopRun() {
+  APP.isRunning=false; clearInterval(APP.runTimer);
+  Api.stopRun('current');
+  addLog('WARN','⏹ Run stopped by user');
+  document.getElementById('rStopBtn').disabled=true;
+  document.getElementById('rPulse').className='puls off';
+  document.getElementById('rStatusTxt').textContent='Stopped';
+  toast('Run stopped','⏹');
+}
+
+function addLog(type,msg){
+  const stream=document.getElementById('logStream'); if(!stream)return;
+  // Clear placeholder on first log
+  if(stream.querySelector('div[style*="flex-direction"]'))stream.innerHTML='';
+  const now=new Date();
+  const t=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  const map={PASS:'pass',FAIL:'fail',INFO:'info',WARN:'warn',HEAL:'heal',STEP:'step',DATA:'data',API:'api'};
+  const cls=map[type]||'info';
+  document.querySelectorAll('.lge.cur').forEach(e=>e.classList.remove('cur'));
+  const div=document.createElement('div');
+  div.className=`lge${type==='STEP'?' cur':''}${type==='FAIL'?' err':''}`;
+  div.innerHTML=`<span class="lgt">${t}</span><span class="lgk ${cls}">${type}</span><span class="lgm">${esc(msg)}</span>`;
+  div.style.cssText='opacity:0;transform:translateX(-3px);transition:all .18s';
+  stream.appendChild(div);
+  requestAnimationFrame(()=>{div.style.opacity='1';div.style.transform='translateX(0)';});
+  stream.scrollTop=stream.scrollHeight;
+}
+
+function renderStepProg(suite,curIdx,forceStatus){
+  const list=document.getElementById('rStepList');if(!list)return;
+  list.innerHTML=suite.steps.map((st,i)=>{
+    let cls='pend',ic='○';
+    if(i<curIdx||(i===curIdx&&st.status==='pass')){cls='done';ic='✅';}
+    else if(i===curIdx&&st.status==='fail'){cls='fail';ic='❌';}
+    else if(i===curIdx){cls='cur';ic='⏳';}
+    const ms=st.status==='pass'?`${(80+Math.random()*450).toFixed(0)}ms`:st.status==='fail'?'failed':'—';
+    return `<div class="spi ${cls}"><span class="spi-ic">${ic}</span><span class="spi-t">[${i+1}] ${esc(st.desc||st.action)}</span><span class="spi-d">${ms}</span></div>`;
+  }).join('');
+}
+
+function updateBM(st,state){
+  const c=document.getElementById('bmContent'); if(!c)return;
+  const templates={fill:`<div class="bm-form"><div class="bm-r" style="width:55%;margin-bottom:3px"></div><div class="bm-inp" style="border-color:var(--cyan)"></div><div class="bm-inp" style="margin-top:2px"></div><div class="bm-btn" style="margin-top:3px"></div></div>`,click:`<div style="display:flex;flex-direction:column;gap:2px"><div class="bm-r"></div><div class="bm-hl">▶ CLICK</div><div class="bm-r" style="width:70%"></div></div>`,assert_text:`<div style="display:flex;flex-direction:column;gap:2px"><div class="bm-r" style="width:80%"></div><div style="border:1px solid var(--green);border-radius:2px;padding:1px 4px;font-size:6px;color:var(--green);font-family:var(--fm)">✓ assert</div></div>`,screenshot:`<div style="display:flex;flex-direction:column;gap:2px;align-items:center;padding-top:4px"><div style="font-size:8px;color:var(--cyan)">📷 Captured</div><div class="bm-r" style="width:90%"></div></div>`};
+  if(state==='fail'){c.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--red);font-size:9px;flex-direction:column;gap:3px"><div>❌</div><div>Step failed</div></div>`;return;}
+  c.innerHTML=templates[st.action]||`<div style="display:flex;flex-direction:column;gap:2px"><div class="bm-r"></div><div class="bm-r" style="width:70%"></div><div class="bm-r" style="width:50%"></div></div>`;
+}
+
+// ════════════════════════════════════════════════════════
+//  DASHBOARD
+// ════════════════════════════════════════════════════════
+function refreshDashboard(){
+  const runs=APP.runHistory,total=runs.length;
+  const passed=runs.filter(r=>r.status==='pass').length;
+  const rate=total?Math.round((passed/total)*100):null;
+  const avg=total?(runs.reduce((s,r)=>s+parseFloat(r.duration),0)/total).toFixed(1)+'s':'—';
+  document.getElementById('dStatRuns').textContent=total;
+  document.getElementById('dStatPass').textContent=rate!==null?rate+'%':'—';
+  document.getElementById('dStatPassLbl').textContent=total?`${passed}/${total} runs`:'No runs yet';
+  document.getElementById('dStatChip').style.display=total?'inline-block':'none';
+  if(total){document.getElementById('dStatChip').textContent=rate>=80?`↑ ${rate}% pass rate`:`↓ ${100-rate}% fail rate`;document.getElementById('dStatChip').className=`sc ${rate>=80?'cup':'cdn'}`;}
+  document.getElementById('dSpark').innerHTML=runs.slice(-7).map(r=>`<div class="spk" style="background:${r.status==='pass'?'var(--green)':'var(--red)'};height:${35+Math.random()*65}%"></div>`).join('');
+  document.getElementById('dStatObj').textContent=APP.objRepo.length;
+  document.getElementById('dStatRows').textContent=APP.dataTables.reduce((s,t)=>s+t.rows.length,0);
+  if(total){
+    document.getElementById('dRunTable').innerHTML=runs.slice(-5).reverse().map(r=>`<tr><td><strong style="color:var(--t1)">${esc(r.suite)}</strong></td><td><span class="badge ${r.status==='pass'?'bpass':'bfail'}">${r.status}</span></td><td>${r.browser}</td><td style="color:var(--green)">${r.passed}</td><td>${timeAgo(r.timestamp)}</td></tr>`).join('');
+  }
+  document.getElementById('dHealth').innerHTML=APP.suites.map(s=>{
+    const sr=APP.runHistory.filter(r=>r.suite===s.name);
+    const pct=sr.length?Math.round((sr.filter(r=>r.status==='pass').length/sr.length)*100):null;
+    const col=pct===null?'var(--t3)':pct>=90?'var(--green)':pct>=70?'var(--yellow)':'var(--red)';
+    const bCls=pct===null?'':pct>=90?'':'r';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--b3)"><div style="width:140px;font-size:12px;color:var(--t2)">${esc(s.name)}</div><div style="flex:1"><div class="pbar"><div class="pf ${bCls}" style="width:${pct||0}%"></div></div></div><div style="width:38px;text-align:right;font-size:11px;color:${col}">${pct!==null?pct+'%':'—'}</div><span class="badge ${pct===null?'bq':pct>=90?'bpass':pct>=70?'bskip':'bfail'}">${pct===null?'no runs':pct>=90?'stable':pct>=70?'flaky':'failing'}</span></div>`;
+  }).join('');
+  if(runs.length)document.getElementById('dSub').textContent=`E-Commerce · Last run: ${timeAgo(runs[runs.length-1].timestamp)}`;
+}
+
+function addActivity(rec){
+  const feed=document.getElementById('dActivity');
+  const item=document.createElement('div');
+  item.style.cssText='display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--b3);font-size:11px';
+  item.innerHTML=`<div style="width:7px;height:7px;border-radius:50%;background:${rec.status==='pass'?'var(--green)':'var(--red)'};margin-top:3px;flex-shrink:0"></div><div><div style="color:var(--t2)">${rec.status==='pass'?'✓':'✗'} <strong style="color:var(--t1)">${esc(rec.suite)}</strong> ${rec.status==='pass'?`passed all ${rec.passed} steps`:'failed'}</div><div style="font-size:9px;color:var(--t3);margin-top:1px">just now</div></div>`;
+  item.style.opacity='0'; feed.insertBefore(item,feed.firstChild);
+  requestAnimationFrame(()=>{item.style.transition='opacity .3s';item.style.opacity='1';});
+}
+
+// ════════════════════════════════════════════════════════
+//  REPORTS
+// ════════════════════════════════════════════════════════
+function refreshReports(){
+  const runs=APP.runHistory,total=runs.length;
+  const passed=runs.filter(r=>r.status==='pass').length,failed=total-passed;
+  const rate=total?Math.round((passed/total)*100):null;
+  const avg=total?(runs.reduce((s,r)=>s+parseFloat(r.duration),0)/total).toFixed(1)+'s':'—';
+  document.getElementById('rpRuns').textContent=total;
+  document.getElementById('rpPass').textContent=rate!==null?rate+'%':'—';
+  document.getElementById('rpDur').textContent=avg;
+  document.getElementById('rpHeal').textContent=APP.totalHeals;
+  if(total){
+    document.getElementById('rpDonut').style.background=`conic-gradient(var(--green) 0% ${rate}%,var(--red) ${rate}% 100%)`;
+    document.getElementById('rpDonutPct').textContent=rate+'%';
+    document.getElementById('rpLgPass').textContent=`Passed: ${passed}`;
+    document.getElementById('rpLgFail').textContent=`Failed: ${failed}`;
+    document.getElementById('rpTrend').innerHTML=runs.map(r=>`<div class="trb" style="background:${r.status==='pass'?'var(--green)':'var(--red)'};height:${40+Math.random()*60}%" title="${r.suite}: ${r.status}"></div>`).join('');
+    document.getElementById('rpTable').innerHTML=runs.slice().reverse().map(r=>`<tr><td class="mono" style="color:var(--t3)">#${r.id}</td><td><strong style="color:var(--t1)">${esc(r.suite)}</strong></td><td><span class="badge ${r.status==='pass'?'bpass':'bfail'}">${r.status}</span></td><td style="color:var(--green)">${r.passed}</td><td style="color:var(--red)">${r.failed}</td><td style="color:var(--purple)">${r.dataTable?esc(r.dataTable):'—'}</td><td>${r.duration}s</td><td>${r.browser}</td><td>${timeAgo(r.timestamp)}</td></tr>`).join('');
+  }
+  Api.getRunResults('all');
+}
+
+function exportReport(){Api.getRunResults('export'); toast('Allure report exported','📤');}
+
+// ════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  loadSuite(0);
+  refreshDashboard();
+  updateCounts();
+  // Seed the API log with some startup calls
+  setTimeout(()=>{Api.getSuites(); Api.getObjects(); Api.getTables();},300);
+  refreshKwPkgDropdown();
+});
+
+
+// ════════════════════════════════════════════════════════
+//  KEYWORD LIBRARY
+// ════════════════════════════════════════════════════════
+const EV_CLS = { beforeSuite:'ev-before', afterSuite:'ev-after', beforeStep:'ev-before', afterStep:'ev-after', onError:'ev-error' };
+
+function renderKeywords() {
+  const search = (document.getElementById('kwSearch')?.value || '').toLowerCase();
+  const libs = APP.keywordLibs;
+  const totalKws = libs.reduce((s,l)=>s+l.keywords.length,0);
+  document.getElementById('kwSub').textContent = libs.length + ' packages · ' + totalKws + ' keywords';
+  document.getElementById('sbKwCnt').textContent = totalKws;
+
+  // Package list
+  const pkgEl = document.getElementById('kwPkgList');
+  pkgEl.innerHTML = '<div class="pkg-item' + (!APP.selKwLib ? ' sel' : '') + '" onclick="selKwPkg(null)">' +
+    '<div class="pkg-name">All Packages</div>' +
+    '<div class="pkg-cnt">' + totalKws + ' keywords</div></div>' +
+    libs.map(l => '<div class="pkg-item' + (APP.selKwLib===l.id ? ' sel' : '') + '" onclick="selKwPkg(' + l.id + ')">' +
+      '<div class="pkg-name">' + esc(l.name) + '</div>' +
+      '<div class="pkg-path">' + esc(l.pkg) + '</div>' +
+      '<div class="pkg-cnt">' + l.keywords.length + ' keywords · ' + l.keywords.reduce((s,k)=>s+k.uses,0) + ' uses</div>' +
+    '</div>').join('');
+
+  // Keyword list
+  const filteredLibs = APP.selKwLib ? libs.filter(l=>l.id===APP.selKwLib) : libs;
+  const allKws = filteredLibs.flatMap(l => l.keywords.map(k => ({...k, libId:l.id, libName:l.name, pkg:l.pkg})));
+  const filtered = search ? allKws.filter(k => k.name.toLowerCase().includes(search) || k.desc.toLowerCase().includes(search) || (k.tags||[]).some(t=>t.includes(search))) : allKws;
+
+  const kwTitle = document.getElementById('kwListTitle');
+  kwTitle.textContent = APP.selKwLib ? (libs.find(l=>l.id===APP.selKwLib)?.name || 'Keywords') : 'All Keywords';
+  document.getElementById('kwListCount').textContent = filtered.length + '/' + allKws.length;
+
+  const kwEl = document.getElementById('kwList');
+  if (!filtered.length) { kwEl.innerHTML = '<div class="empty" style="padding:16px"><div class="eic" style="font-size:18px">🔑</div>No keywords found</div>'; return; }
+  kwEl.innerHTML = filtered.map(k =>
+    '<div class="kw-item' + (APP.selKwId===k.id ? ' sel' : '') + '" onclick="selKeyword(' + k.id + ',' + k.libId + ')">' +
+      '<div class="kw-name">' + esc(k.name) + '()</div>' +
+      '<div class="kw-sig">' + esc(k.pkg + '.' + k.libName) + '</div>' +
+      '<div style="margin-top:3px">' + (k.tags||[]).map(t=>'<span class="kw-tag">' + esc(t) + '</span>').join('') + '</div>' +
+      '<div style="font-size:9px;color:var(--t3);margin-top:3px">' + k.params.map(p=>p.name+':'+p.type).join(', ') + ' → ' + k.returns + ' · used ' + k.uses + '×</div>' +
+    '</div>'
+  ).join('');
+}
+
+function selKwPkg(id) {
+  APP.selKwLib = id; APP.selKwId = null;
+  renderKeywords();
+  document.getElementById('kwDetail').innerHTML = '<div class="empty"><div class="eic">🔑</div>Select a keyword to edit</div>';
+}
+
+function filterKeywords() { renderKeywords(); }
+
+function selKeyword(kwId, libId) {
+  APP.selKwId = kwId; APP.selKwLib = libId;
+  renderKeywords();
+  const lib = APP.keywordLibs.find(l=>l.id===libId);
+  const kw = lib?.keywords.find(k=>k.id===kwId);
+  if (!lib || !kw) return;
+
+  // Count linked steps
+  const linkedSteps = APP.suites.flatMap(s => s.steps.filter(st=>st.kwId===kwId).map(st=>({suite:s.name, step:st})));
+
+  const sig = kw.name + '(' + kw.params.map(p=>p.name+': '+p.type).join(', ') + '): ' + kw.returns;
+
+  document.getElementById('kwDetail').innerHTML = '<div style="padding:9px 14px;border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:7px;background:var(--bg2);flex-shrink:0">' +
+    '<div style="font-family:var(--fd);font-size:14px;font-weight:700;color:var(--t1)">' + esc(kw.name) + '</div>' +
+    '<span class="badge bq">' + esc(lib.name) + '</span>' +
+    '<span style="font-size:10px;color:var(--t3);font-family:var(--fm)">' + kw.returns + '</span>' +
+    '<div style="margin-left:auto;display:flex;gap:5px">' +
+      '<button class="btn bd bsm" onclick="deleteKeyword(' + kwId + ',' + libId + ')">🗑</button>' +
+      '<button class="btn bg bsm" onclick="addKwStep(' + kwId + ',' + libId + ')">+ Use in Step</button>' +
+      '<button class="btn bp bsm" onclick="saveKeyword(' + kwId + ',' + libId + ')">💾 Save</button>' +
+    '</div></div>' +
+
+    '<div style="flex:1;overflow-y:auto;padding:14px">' +
+    '<div class="stl" style="margin-top:0">Signature</div>' +
+    '<div class="lrow"><div class="ltype">function</div><div class="lval" style="font-family:var(--fm);color:var(--yellow)">' + esc(sig) + '</div></div>' +
+    '<div class="lrow"><div class="ltype">package</div><div class="lval">' + esc(lib.pkg) + '</div></div>' +
+    '<div class="lrow"><div class="ltype">import</div><div class="lval">import { ' + esc(lib.name) + ' } from \"./keywords/' + esc(lib.name) + '\"</div></div>' +
+
+    '<div class="stl">Description</div>' +
+    '<div class="ffield"><input class="fi" id="kwEditDesc" value="' + esc(kw.desc) + '" oninput="kwLiveEdit(&#x27;desc&#x27;,this.value,' + kwId + ',' + libId + ')"></div>' +
+
+    (kw.params.length ? '<div class="stl">Parameters</div>' +
+    '<table class="tbl" style="margin-bottom:8px"><thead><tr><th>#</th><th>Name</th><th>Type</th></tr></thead><tbody>' +
+    kw.params.map((p,i)=>'<tr><td style="color:var(--t3)">'+(i+1)+'</td><td style="font-family:var(--fm);color:var(--yellow)">'+esc(p.name)+'</td><td style="color:var(--cyan)">'+esc(p.type)+'</td></tr>').join('') +
+    '</tbody></table>' : '') +
+
+    '<div class="stl">Function Body</div>' +
+    '<div class="aitxt" style="font-size:9px;color:var(--t3);margin-bottom:5px">TypeScript / Playwright · <code>page</code>, <code>expect</code>, and <code>obj()</code> are available</div>' +
+    '<textarea class="kw-body" id="kwBodyEdit" rows="8" oninput="kwLiveEdit(&#x27;body&#x27;,this.value,' + kwId + ',' + libId + ')">' + esc(kw.body) + '</textarea>' +
+
+    '<div class="stl">Tags</div>' +
+    '<div class="ffield"><input class="fi" id="kwTagEdit" value="' + esc((kw.tags||[]).join(', ')) + '" oninput="kwLiveEdit(&#x27;tagsRaw&#x27;,this.value,' + kwId + ',' + libId + ')" placeholder="auth, login, utility"></div>' +
+
+    '<div class="stl">Linked Test Steps (' + linkedSteps.length + ')</div>' +
+    (linkedSteps.length ? linkedSteps.map(l=>'<div style="display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:4px;background:var(--bg3);border:1px solid var(--b2);margin-bottom:3px;font-size:11px">' +
+      '<span class="stag tkw">KW</span><span style="color:var(--t2)">' + esc(l.step.desc) + '</span><span style="color:var(--t3);margin-left:auto">' + esc(l.suite) + '</span></div>').join('')
+      : '<div style="font-size:11px;color:var(--t3)">Not used in any test steps yet</div>') +
+
+    '<div class="stl">Generated TypeScript</div>' +
+    '<div style="background:var(--bg);border:1px solid var(--b2);border-radius:5px;padding:10px;font-family:var(--fm);font-size:11px;color:var(--t2);white-space:pre-wrap">' + esc(genKwTs(lib, kw)) + '</div>' +
+    '</div>';
+
+  document.getElementById('kwDetail').style.cssText = 'display:flex;flex-direction:column;overflow:hidden;flex:1';
+}
+
+function genKwTs(lib, kw) {
+  const params = kw.params.map(p=>p.name+': '+p.type).join(', ');
+  const lines2 = [
+    'import { Page, expect } from "@playwright/test";',
+    'import { obj } from "../helpers/objectRepo";',
+    '',
+    'export class ' + lib.name + ' {',
+    '  constructor(private page: Page) {}',
+    '',
+    '  async ' + kw.name + '(' + params + '): Promise<' + kw.returns + '> {',
+  ];
+  kw.body.split('\n').forEach(l => lines2.push('    ' + l));
+  lines2.push('  }', '}');
+  return lines2.join('\n');
+}
+
+function kwLiveEdit(field, val, kwId, libId) {
+  const lib = APP.keywordLibs.find(l=>l.id===libId);
+  const kw = lib?.keywords.find(k=>k.id===kwId);
+  if (!kw) return;
+  if (field === 'tagsRaw') kw.tags = val.split(',').map(t=>t.trim()).filter(Boolean);
+  else kw[field] = val;
+  Api.updateObject(kwId, {[field]: val});
+}
+
+function saveKeyword(kwId, libId) {
+  const lib = APP.keywordLibs.find(l=>l.id===libId);
+  const kw = lib?.keywords.find(k=>k.id===kwId);
+  if (!kw) return;
+  kw.body = document.getElementById('kwBodyEdit')?.value || kw.body;
+  kw.desc = document.getElementById('kwEditDesc')?.value || kw.desc;
+  Api.updateObject(kwId, kw);
+  toast('Keyword saved', '💾');
+  renderKeywords();
+}
+
+function deleteKeyword(kwId, libId) {
+  if (!confirm('Delete this keyword?')) return;
+  const lib = APP.keywordLibs.find(l=>l.id===libId);
+  if (!lib) return;
+  lib.keywords = lib.keywords.filter(k=>k.id!==kwId);
+  APP.selKwId = null;
+  renderKeywords();
+  document.getElementById('kwDetail').innerHTML = '<div class="empty"><div class="eic">🔑</div>Keyword deleted</div>';
+  toast('Deleted', '🗑');
+}
+
+function addKwStep(kwId, libId) {
+  const lib = APP.keywordLibs.find(l=>l.id===libId);
+  const kw = lib?.keywords.find(k=>k.id===kwId);
+  if (!kw) return;
+  const suite = APP.suites[APP.suiteIdx];
+  suite.steps.push({ id:++APP.idCtr, action:'keyword', desc:'Call ' + kw.name, value:'', selector:'', kwLib:libId, kwId:kwId, kwArgs:[], status:'pending' });
+  toast('Step added to ' + suite.name, '✅');
+  switchPage('builder');
+}
+
+function createKwLib() {
+  const name = document.getElementById('nklName').value.trim();
+  const pkg  = document.getElementById('nklPkg').value.trim();
+  if (!name) { toast('Name required', '⚠️'); return; }
+  const lib = { id: ++APP.idCtr, name, pkg: pkg || 'com.project.' + name.toLowerCase(), desc: document.getElementById('nklDesc').value.trim(), keywords: [] };
+  APP.keywordLibs.push(lib);
+  hideModal('newKwLibModal');
+  refreshKwPkgDropdown();
+  renderKeywords();
+  toast('"' + name + '" package created', '📦');
+}
+
+function createKeyword() {
+  const name  = document.getElementById('nkwName').value.trim();
+  const libId = +document.getElementById('nkwPkg').value;
+  if (!name || !libId) { toast('Name and package required', '⚠️'); return; }
+  const lib = APP.keywordLibs.find(l=>l.id===libId);
+  if (!lib) return;
+  const paramsRaw = document.getElementById('nkwParams').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const params = paramsRaw.map(p => { const [n,t] = p.split(':'); return {name:(n||'param').trim(), type:(t||'String').trim()}; });
+  const kw = {
+    id: ++APP.idCtr, name, desc: document.getElementById('nkwDesc').value.trim(),
+    params, returns: document.getElementById('nkwReturns').value,
+    tags: document.getElementById('nkwTags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    body: document.getElementById('nkwBody').value.trim(), uses: 0
+  };
+  lib.keywords.push(kw);
+  hideModal('newKwModal');
+  APP.selKwLib = libId; APP.selKwId = kw.id;
+  renderKeywords();
+  selKeyword(kw.id, libId);
+  toast('"' + name + '" created', '🔑');
+}
+
+function refreshKwPkgDropdown() {
+  const sel = document.getElementById('nkwPkg');
+  if (sel) sel.innerHTML = APP.keywordLibs.map(l => '<option value="' + l.id + '">' + l.name + '</option>').join('');
+}
+
+// ════════════════════════════════════════════════════════
+//  TEST LISTENERS
+// ════════════════════════════════════════════════════════
+function renderListeners() {
+  const el = document.getElementById('listenerList');
+  if (!el) return;
+  const evOrder = ['beforeSuite','beforeStep','afterStep','afterSuite','onError'];
+  const sorted = [...APP.listeners].sort((a,b) => evOrder.indexOf(a.event) - evOrder.indexOf(b.event));
+
+  el.innerHTML = sorted.map(l => {
+    const cls = EV_CLS[l.event] || 'ev-before';
+    return '<div class="listener-item' + (APP.selListener===l.id?' sel':'') + (l.enabled?'':' disabled') + '" onclick="selListener(' + l.id + ')">' +
+      '<div style="display:flex;align-items:center;gap:7px">' +
+        '<span class="ev-badge ' + cls + '">' + esc(l.event) + '</span>' +
+        '<span style="font-size:12px;font-weight:600;color:var(--t1)">' + esc(l.name) + '</span>' +
+        '<div class="toggle-sw' + (l.enabled?' on':'') + '" onclick="event.stopPropagation();toggleListener(' + l.id + ')" title="' + (l.enabled?'Disable':'Enable') + '"></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function selListener(id) {
+  APP.selListener = id;
+  renderListeners();
+  const l = APP.listeners.find(x=>x.id===id);
+  if (!l) return;
+  const cls = EV_CLS[l.event] || 'ev-before';
+  const detail = document.getElementById('listenerDetail');
+  detail.innerHTML =
+    '<div style="padding:9px 14px;border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:7px;background:var(--bg2);flex-shrink:0">' +
+      '<span class="ev-badge ' + cls + '">' + esc(l.event) + '</span>' +
+      '<span style="font-family:var(--fd);font-size:14px;font-weight:700;color:var(--t1)">' + esc(l.name) + '</span>' +
+      '<div style="margin-left:auto;display:flex;gap:5px">' +
+        '<button class="btn bd bsm" onclick="deleteListener(' + id + ')">🗑</button>' +
+        '<button class="btn bp bsm" onclick="saveListener(' + id + ')">💾 Save</button>' +
+      '</div>' +
+    '</div>' +
+    '<div style="flex:1;overflow-y:auto;padding:14px">' +
+      '<div class="stl" style="margin-top:0">Event Context</div>' +
+      '<div class="lrow"><div class="ltype">fires</div><div class="lval">' + esc(l.event) + ' · every suite run</div></div>' +
+      '<div class="lrow"><div class="ltype">scope</div><div class="lval">page, test, error (afterStep/onError only)</div></div>' +
+      '<div class="lrow"><div class="ltype">status</div><div class="lval">' + (l.enabled ? '<span style="color:var(--green)">● enabled</span>' : '<span style="color:var(--red)">● disabled</span>') + '</div></div>' +
+      '<div class="stl">Name</div>' +
+      '<div class="ffield"><input class="fi" id="lEditName" value="' + esc(l.name) + '"></div>' +
+      '<div class="stl">Hook Body</div>' +
+      '<div style="font-size:9px;color:var(--t3);margin-bottom:5px">Available: <code>page</code>, <code>test</code>, <code>error</code> (on afterStep/onError). Async/await supported.</div>' +
+      '<textarea class="kw-body" id="lBodyEdit" rows="10">' + esc(l.body) + '</textarea>' +
+      '<div class="stl">Playwright Fixture Equivalent</div>' +
+      '<div style="background:var(--bg);border:1px solid var(--b2);border-radius:5px;padding:10px;font-family:var(--fm);font-size:11px;color:var(--t2);white-space:pre-wrap">' + esc(genListenerTs(l)) + '</div>' +
+    '</div>';
+  detail.style.cssText = 'display:flex;flex-direction:column;overflow:hidden;flex:1';
+}
+
+function genListenerTs(l) {
+  const hookMap = {
+    beforeSuite:  'test.beforeAll(async ({ page }) => {',
+    afterSuite:   'test.afterAll(async ({ page }) => {',
+    beforeStep:   'test.beforeEach(async ({ page }) => {',
+    afterStep:    'test.afterEach(async ({ page }) => {',
+    onError:      '// In playwright.config.ts:\nglobalSetup: async () => { process.on("unhandledRejection", async (error) => {'
+  };
+  const hook = hookMap[l.event] || 'test.beforeAll(async ({ page }) => {';
+  return hook + '\n  ' + l.body.split('\n').join('\n  ') + '\n});';
+}
+
+function saveListener(id) {
+  const l = APP.listeners.find(x=>x.id===id);
+  if (!l) return;
+  l.name = document.getElementById('lEditName')?.value || l.name;
+  l.body = document.getElementById('lBodyEdit')?.value || l.body;
+  toast('Listener saved', '💾');
+  renderListeners();
+}
+
+function toggleListener(id) {
+  const l = APP.listeners.find(x=>x.id===id);
+  if (l) { l.enabled = !l.enabled; renderListeners(); }
+}
+
+function deleteListener(id) {
+  if (!confirm('Delete this listener?')) return;
+  APP.listeners = APP.listeners.filter(l=>l.id!==id);
+  APP.selListener = null;
+  renderListeners();
+  document.getElementById('listenerDetail').innerHTML = '<div class="empty"><div class="eic">🎣</div>Listener deleted</div>';
+  toast('Deleted', '🗑');
+}
+
+function createListener() {
+  const name = document.getElementById('nlName').value.trim();
+  if (!name) { toast('Name required', '⚠️'); return; }
+  const l = { id:++APP.idCtr, name, event:document.getElementById('nlEvent').value, enabled:true, body:document.getElementById('nlBody').value.trim() };
+  APP.listeners.push(l);
+  hideModal('newListenerModal');
+  renderListeners();
+  selListener(l.id);
+  toast('"' + name + '" listener created', '🎣');
+}
+
+</script>
+</body>
+</html>
