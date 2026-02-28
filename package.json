@@ -1,0 +1,22 @@
+{
+  "name": "playarc-server",
+  "version": "1.0.0",
+  "description": "PlayArc backend — Playwright execution engine + REST + WebSocket API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test:gen": "node -e \"require('./server').generateSpec\"",
+    "install:browsers": "npx playwright install"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.44.0",
+    "better-sqlite3": "^9.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "ws": "^8.17.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
