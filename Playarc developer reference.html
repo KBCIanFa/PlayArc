@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PlayArc — Developer Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07101C;--bg2:#0C1A2B;--bg3:#112236;--bg4:#162C42;
+  --cyan:#00D4FF;--clo:rgba(0,212,255,.10);
+  --green:#00E5A0;--glo:rgba(0,229,160,.08);
+  --orange:#FF8C42;--olo:rgba(255,140,66,.08);
+  --red:#FF3D6B;--rlo:rgba(255,61,107,.08);
+  --yellow:#FFD166;--ylo:rgba(255,209,102,.08);
+  --purple:#A78BFA;--plo:rgba(167,139,250,.08);
+  --t1:#E4F0FB;--t2:#7A9EBF;--t3:#365470;
+  --b1:rgba(0,212,255,.12);--b2:rgba(255,255,255,.06);--b3:rgba(255,255,255,.03);
+  --fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--fm:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-size:13px;line-height:1.6;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:var(--t3);border-radius:4px;}
+
+/* Layout */
+.wrapper{display:flex;min-height:100vh;}
+nav{width:240px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--b2);position:sticky;top:0;height:100vh;overflow-y:auto;padding:20px 0;}
+.nav-logo{padding:0 16px 20px;border-bottom:1px solid var(--b2);margin-bottom:12px;}
+.nav-logo .mark{font-family:var(--fd);font-size:18px;font-weight:800;color:var(--t1);}
+.nav-logo .mark em{color:var(--cyan);font-style:normal;}
+.nav-logo .sub{font-size:10px;color:var(--t3);margin-top:2px;}
+.nav-section{padding:4px 16px 2px;font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--t3);margin-top:10px;}
+.nav-item{display:block;padding:6px 16px;font-size:12px;color:var(--t2);text-decoration:none;cursor:pointer;transition:all .12s;border-left:2px solid transparent;}
+.nav-item:hover{color:var(--t1);background:var(--b2);}
+.nav-item.active{color:var(--cyan);border-left-color:var(--cyan);background:var(--clo);}
+main{flex:1;overflow-y:auto;}
+
+/* Content */
+.content{max-width:920px;margin:0 auto;padding:40px 40px 80px;}
+.page-section{display:none;}
+.page-section.active{display:block;}
+
+h1{font-family:var(--fd);font-size:28px;font-weight:800;color:var(--t1);margin-bottom:6px;}
+h2{font-family:var(--fd);font-size:18px;font-weight:700;color:var(--t1);margin:40px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--b2);}
+h3{font-size:13px;font-weight:700;color:var(--cyan);margin:24px 0 8px;text-transform:uppercase;letter-spacing:.6px;}
+p{color:var(--t2);margin-bottom:12px;line-height:1.7;}
+code{font-family:var(--fm);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:3px;color:var(--cyan);}
+pre{font-family:var(--fm);font-size:11.5px;background:var(--bg2);border:1px solid var(--b2);border-radius:6px;padding:14px 16px;overflow-x:auto;line-height:1.8;margin-bottom:14px;}
+pre .c{color:var(--t3);}
+pre .k{color:var(--purple);}
+pre .s{color:var(--green);}
+pre .n{color:var(--cyan);}
+pre .m{color:var(--orange);}
+pre .v{color:var(--yellow);}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;font-family:var(--fm);}
+.get{background:rgba(0,229,160,.15);color:var(--green);}
+.post{background:var(--clo);color:var(--cyan);}
+.put{background:var(--ylo);color:var(--yellow);}
+.del{background:var(--rlo);color:var(--red);}
+.ws{background:var(--plo);color:var(--purple);}
+
+/* File tree */
+.tree{font-family:var(--fm);font-size:12px;background:var(--bg2);border:1px solid var(--b2);border-radius:6px;padding:16px 20px;margin-bottom:20px;line-height:2;}
+.tree-line{display:flex;align-items:flex-start;gap:0;}
+.tree-prefix{color:var(--t3);flex-shrink:0;}
+.tree-name{color:var(--t1);}
+.tree-name.dir{color:var(--cyan);font-weight:700;}
+.tree-name.gen{color:var(--green);}
+.tree-name.cfg{color:var(--yellow);}
+.tree-name.kw{color:var(--purple);}
+.tree-comment{color:var(--t3);margin-left:auto;padding-left:20px;font-size:10px;}
+.tree-arrow{color:var(--orange);margin:0 6px;font-size:10px;}
+
+/* Endpoint blocks */
+.ep{background:var(--bg2);border:1px solid var(--b2);border-radius:7px;margin-bottom:14px;overflow:hidden;}
+.ep-head{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--b2);background:var(--bg3);}
+.ep-path{font-family:var(--fm);font-size:13px;font-weight:700;color:var(--t1);}
+.ep-desc{font-size:11px;color:var(--t2);}
+.ep-body{padding:12px 14px;}
+.ep-section{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);margin:10px 0 5px;}
+
+/* WS events */
+.ws-event{display:flex;gap:12px;padding:8px 10px;border-radius:5px;border:1px solid var(--b2);background:var(--bg3);margin-bottom:6px;align-items:flex-start;}
+.ws-type{font-family:var(--fm);font-size:10px;font-weight:700;color:var(--purple);width:80px;flex-shrink:0;padding-top:1px;}
+.ws-when{font-size:10px;color:var(--t3);width:140px;flex-shrink:0;}
+.ws-payload{font-family:var(--fm);font-size:10px;color:var(--t2);flex:1;}
+
+/* Mapping table */
+.map-table{width:100%;border-collapse:collapse;margin-bottom:20px;}
+.map-table th{text-align:left;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);padding:8px 12px;border-bottom:2px solid var(--b2);}
+.map-table td{padding:8px 12px;font-size:12px;color:var(--t2);border-bottom:1px solid var(--b3);vertical-align:top;}
+.map-table tr:hover td{background:var(--b2);}
+.map-table .kat{color:var(--orange);}
+.map-table .pw{color:var(--cyan);}
+.map-table .arrow{color:var(--t3);text-align:center;}
+
+/* Callout */
+.callout{padding:12px 14px;border-radius:6px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start;}
+.callout.info{background:var(--clo);border:1px solid var(--b1);}
+.callout.warn{background:var(--ylo);border:1px solid rgba(255,209,102,.2);}
+.callout.tip{background:var(--glo);border:1px solid rgba(0,229,160,.15);}
+.callout-ic{font-size:16px;flex-shrink:0;line-height:1.4;}
+.callout-body{font-size:12px;color:var(--t2);line-height:1.6;}
+.callout-body strong{color:var(--t1);}
+
+/* Page header */
+.page-header{margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--b2);}
+.page-tag{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--cyan);margin-bottom:6px;}
+.page-sub{font-size:13px;color:var(--t2);margin-top:4px;}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<!-- ── NAV ─────────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-logo">
+    <div class="mark">Play<em>Arc</em></div>
+    <div class="sub">Developer Reference · v1.0</div>
+  </div>
+  <div class="nav-section">Architecture</div>
+  <a class="nav-item active" onclick="show('overview')">System Overview</a>
+  <a class="nav-item" onclick="show('filestructure')">File Structure</a>
+  <a class="nav-item" onclick="show('katalon')">Katalon Mapping</a>
+  <div class="nav-section">API</div>
+  <a class="nav-item" onclick="show('suites')">Suites &amp; Runs</a>
+  <a class="nav-item" onclick="show('objects')">Object Repository</a>
+  <a class="nav-item" onclick="show('tables')">Data Tables</a>
+  <a class="nav-item" onclick="show('heal')">Self-Heal &amp; Inspect</a>
+  <div class="nav-section">Live Execution</div>
+  <a class="nav-item" onclick="show('websocket')">WebSocket Protocol</a>
+  <a class="nav-item" onclick="show('codegen')">Code Generation</a>
+  <div class="nav-section">Setup</div>
+  <a class="nav-item" onclick="show('quickstart')">Quick Start</a>
+</nav>
+
+<!-- ── MAIN ────────────────────────────────────────────────── -->
+<main>
+<div class="content">
+
+<!-- ══ OVERVIEW ════════════════════════════════════════════ -->
+<div class="page-section active" id="sec-overview">
+  <div class="page-header">
+    <div class="page-tag">Architecture</div>
+    <h1>System Overview</h1>
+    <p class="page-sub">How the PlayArc UI, REST API, WebSocket, and Playwright runner connect</p>
+  </div>
+
+  <div class="callout info">
+    <div class="callout-ic">💡</div>
+    <div class="callout-body"><strong>Base URL:</strong> <code>http://localhost:4000/api</code> — defined as <code>BASE_URL</code> in the top of the UI HTML file. Change this one constant to connect the UI to any environment.</div>
+  </div>
+
+  <h2>Request Flow</h2>
+  <pre><span class="c">┌─────────────────────────────────────────────────────────────────┐
+│                      PlayArc UI (browser)                       │
+│   Dashboard · Builder · Objects · Data Tables · Runner          │
+└──────────────┬──────────────────────────────────┬──────────────┘
+               │  REST  HTTP/1.1                  │  WebSocket
+               │  Content-Type: application/json  │  ws://host/ws?runId=…
+               ▼                                  ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    server.js  (Node.js 18+)                     │
+│   Express 4 · REST routes                                       │
+│   ws · WebSocket server                                         │
+│   better-sqlite3 · persistent storage                           │
+└──────────────┬──────────────────────────────────────────────────┘
+               │  generates .spec.ts                │  streams events back
+               │  spawns child process              │  via broadcast()
+               ▼                                  ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                  npx playwright test *.spec.ts                  │
+│   Chromium · Firefox · WebKit                                   │
+│   JSON reporter → stdout parsed by server                       │
+└──────────────────────────────────────────────────────────────────┘</span></pre>
+
+  <h2>Three-Phase Run Lifecycle</h2>
+  <pre><span class="c">Phase 1 — GENERATE  (server, synchronous)</span>
+  Write keyword library .ts files to disk
+  Write objectRepo helper from DB
+  Write test listener fixtures from DB
+  Generate suite-specific .spec.ts
+
+<span class="c">Phase 2 — EXECUTE   (child process, async)</span>
+  spawn('npx', ['playwright', 'test', specPath, '--reporter=json'])
+  Parse stdout JSON events → broadcast() to WebSocket clients
+  Handle self-heal if selector fails
+
+<span class="c">Phase 3 — REPORT    (server, on process close)</span>
+  Parse results.json from playwright output
+  UPDATE runs SET status, passed, failed, duration
+  Broadcast 'complete' event to UI</pre>
+
+  <h2>Key Design Decisions</h2>
+  <table class="map-table">
+    <thead><tr><th>Decision</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td>202 Accepted on POST /run</td><td>Run is async — respond immediately, stream progress via WS</td></tr>
+      <tr><td>SQLite for storage</td><td>Zero config, file-based, sufficient for team use. Swap to Postgres by changing the DB layer</td></tr>
+      <tr><td>Spec files written to disk</td><td>Playwright requires real .ts files — also gives developers transparent, readable output</td></tr>
+      <tr><td>WebSocket per runId</td><td>Multiple clients can watch the same run (useful for CI dashboards)</td></tr>
+      <tr><td>Self-heal on selector failure</td><td>Tries fallback selectors from Object Repo before marking step failed</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══ FILE STRUCTURE ══════════════════════════════════════ -->
+<div class="page-section" id="sec-filestructure">
+  <div class="page-header">
+    <div class="page-tag">Architecture</div>
+    <h1>File Structure</h1>
+    <p class="page-sub">How the Playwright project on disk maps to what you see in the PlayArc UI</p>
+  </div>
+
+  <h2>Server &amp; Generated Output</h2>
+  <div class="tree">
+    <div class="tree-line"><span class="tree-prefix"></span><span class="tree-name dir">playarc-server/</span></div>
+    <div class="tree-line"><span class="tree-prefix">│  </span><span class="tree-name cfg">server.js</span><span class="tree-comment">← entry point — run with: node server.js</span></div>
+    <div class="tree-line"><span class="tree-prefix">│  </span><span class="tree-name cfg">package.json</span><span class="tree-comment">← dependencies: express, ws, better-sqlite3, playwright</span></div>
+    <div class="tree-line"><span class="tree-prefix">│  </span><span class="tree-name cfg">playarc.db</span><span class="tree-comment">← SQLite database (auto-created on first run)</span></div>
+    <div class="tree-line"><span class="tree-prefix">│  </span><span class="tree-name cfg">playwright.config.ts</span><span class="tree-comment">← browser config, timeouts, reporters</span></div>
+    <div class="tree-line"><span class="tree-prefix">│</span></div>
+    <div class="tree-line"><span class="tree-prefix">├─ </span><span class="tree-name dir">generated-tests/</span><span class="tree-comment">← all output written here by the server</span></div>
+    <div class="tree-line"><span class="tree-prefix">│  ├─ </span><span class="tree-name dir">specs/</span><span class="tree-comment">← one .spec.ts per run, named: SuiteName-runId.spec.ts</span></div>
+    <div class="tree-line"><span class="tree-prefix">│  │  </span><span class="tree-name gen">Login-Flow-run_a3f2b8.spec.ts</span><span class="tree-comment">← generated from Builder steps</span></div>
+    <div class="tree-line"><span class="tree-prefix">│  │  </span><span class="tree-name gen">Checkout-E2E-run_9b2c14.spec.ts</span></div>
+    <div class="tree-line"><span class="tree-prefix">│  │</span></div>
+    <div class="tree-line"><span class="tree-prefix">│  ├─ </span><span class="tree-name dir">keywords/</span><span class="tree-comment">← one .ts class file per Keyword Library package</span></div>
+    <div class="tree-line"><span class="tree-prefix">│  │  </span><span class="tree-name kw">AuthKeywords.ts</span><span class="tree-comment">← com.project.auth — loginAs(), logout(), assertLoggedIn()</span></div>
+    <div class="tree-line"><span class="tree-prefix">│  │  </span><span class="tree-name kw">CartKeywords.ts</span><span class="tree-comment">← com.project.commerce — addProductToCart(), completePurchase()</span></div>
+    <div class="tree-line"><span class="tree-prefix">│  │  </span><span class="tree-name kw">CommonKeywords.ts</span><span class="tree-comment">← com.project.common — waitAndClick(), captureAndLog()</span></div>
+    <div class="tree-line"><span class="tree-prefix">│  │  </span><span class="tree-name kw">ApiKeywords.ts</span><span class="tree-comment">← com.project.api — postJson(), assertApiStatus()</span></div>
+    <div class="tree-line"><span class="tree-prefix">│  │</span></div>
+    <div class="tree-line"><span class="tree-prefix">│  └─ </span><span class="tree-name dir">helpers/</span><span class="tree-comment">← shared utilities, auto-generated</span></div>
+    <div class="tree-line"><span class="tree-prefix">│     </span><span class="tree-name gen">objectRepo.ts</span><span class="tree-comment">← obj(page, 'Login/emailInput') → Playwright Locator</span></div>
+    <div class="tree-line"><span class="tree-prefix">│     </span><span class="tree-name gen">fixtures.ts</span><span class="tree-comment">← test listeners as Playwright test.extend() fixtures</span></div>
+    <div class="tree-line"><span class="tree-prefix">│</span></div>
+    <div class="tree-line"><span class="tree-prefix">├─ </span><span class="tree-name dir">test-results/</span><span class="tree-comment">← Playwright output directory</span></div>
+    <div class="tree-line"><span class="tree-prefix">│  └─ </span><span class="tree-name dir">run_a3f2b8/</span></div>
+    <div class="tree-line"><span class="tree-prefix">│     </span><span class="tree-name gen">results.json</span><span class="tree-comment">← parsed by server after run completes</span></div>
+    <div class="tree-line"><span class="tree-prefix">│     </span><span class="tree-name gen">trace.zip</span><span class="tree-comment">← Playwright trace viewer file</span></div>
+    <div class="tree-line"><span class="tree-prefix">│</span></div>
+    <div class="tree-line"><span class="tree-prefix">└─ </span><span class="tree-name dir">screenshots/</span><span class="tree-comment">← served statically at /screenshots/*</span></div>
+    <div class="tree-line"><span class="tree-prefix">   └─ </span><span class="tree-name dir">run_a3f2b8/</span></div>
+    <div class="tree-line"><span class="tree-prefix">      </span><span class="tree-name gen">login-success.png</span></div>
+    <div class="tree-line"><span class="tree-prefix">      </span><span class="tree-name gen">order-confirmed.png</span></div>
+  </div>
+
+  <h2>What Gets Generated Per Run</h2>
+  <pre><span class="c">// generated-tests/specs/Login-Flow-run_a3f2b8.spec.ts</span>
+<span class="k">import</span> { test, expect } <span class="k">from</span> <span class="s">'@playwright/test'</span>;
+<span class="k">import</span> { obj } <span class="k">from</span> <span class="s">'../helpers/objectRepo'</span>;
+<span class="k">import</span> { AuthKeywords } <span class="k">from</span> <span class="s">'../keywords/AuthKeywords'</span>;
+
+test.describe(<span class="s">'Login Flow'</span>, () => {
+  test(<span class="s">'Login Flow'</span>, <span class="k">async</span> ({ page }) => {
+    <span class="k">const</span> authKeywords = <span class="k">new</span> <span class="n">AuthKeywords</span>(page);
+
+    <span class="c">// Step 1: Go to login page</span>
+    <span class="k">await</span> page.goto(<span class="s">'https://staging.app.com/login'</span>);
+
+    <span class="c">// Step 2: Call keyword — uses Object Repo internally</span>
+    <span class="k">await</span> authKeywords.loginAs(<span class="s">'admin@test.com'</span>, <span class="s">'secret123'</span>);
+
+    <span class="c">// Step 5: Assert welcome message</span>
+    <span class="k">await</span> expect(page.locator(<span class="s">'.welcome-msg'</span>)).toContainText(<span class="s">'Welcome'</span>);
+  });
+});</pre>
+
+  <h2>Generated Keyword Class</h2>
+  <pre><span class="c">// generated-tests/keywords/AuthKeywords.ts</span>
+<span class="k">import</span> { Page, expect } <span class="k">from</span> <span class="s">'@playwright/test'</span>;
+<span class="k">import</span> { obj } <span class="k">from</span> <span class="s">'../helpers/objectRepo'</span>;
+
+<span class="k">export class</span> <span class="n">AuthKeywords</span> {
+  <span class="k">constructor</span>(<span class="k">private readonly</span> page: Page) {}
+
+  <span class="k">async</span> loginAs(username: <span class="n">string</span>, password: <span class="n">string</span>): Promise&lt;<span class="k">void</span>&gt; {
+    <span class="c">// Uses Object Repo — mirrors Katalon findTestObject('Login/emailInput')</span>
+    <span class="k">await</span> obj(<span class="k">this</span>.page, <span class="s">'Login/emailInput'</span>).fill(username);
+    <span class="k">await</span> obj(<span class="k">this</span>.page, <span class="s">'Login/passwordInput'</span>).fill(password);
+    <span class="k">await</span> obj(<span class="k">this</span>.page, <span class="s">'Login/loginButton'</span>).click();
+    <span class="k">await</span> expect(<span class="k">this</span>.page).toHaveURL(<span class="m">/dashboard/</span>);
+  }
+}</pre>
+
+  <h2>Generated Object Repo Helper</h2>
+  <pre><span class="c">// generated-tests/helpers/objectRepo.ts</span>
+<span class="k">import</span> { Page } <span class="k">from</span> <span class="s">'@playwright/test'</span>;
+
+<span class="k">const</span> REPO = {
+  <span class="s">'Login/emailInput'</span>:  { sel: <span class="s">'[data-testid="email-input"]'</span>, aria: <span class="s">'[aria-label="Email"]'</span>, ... },
+  <span class="s">'Login/loginButton'</span>: { sel: <span class="s">'[data-testid="login-btn"]'</span>,  aria: <span class="s">'[aria-label="Sign In"]'</span>, ... },
+};
+
+<span class="c">// Mirrors Katalon: findTestObject('Login/loginButton')</span>
+<span class="c">// Heals automatically: testid → aria → css → xpath</span>
+<span class="k">export function</span> obj(page: Page, key: <span class="n">string</span>) {
+  <span class="k">const</span> entry = REPO[key];
+  <span class="k">if</span> (!entry) <span class="k">throw new</span> Error(<span class="s">`Object not found: </span><span class="m">${key}</span><span class="s">`</span>);
+  <span class="k">if</span> (entry.sel)  <span class="k">return</span> page.locator(entry.sel);   <span class="c">// priority 1</span>
+  <span class="k">if</span> (entry.aria) <span class="k">return</span> page.locator(entry.aria);  <span class="c">// priority 2</span>
+  <span class="k">if</span> (entry.css)  <span class="k">return</span> page.locator(entry.css);   <span class="c">// priority 3</span>
+  <span class="k">return</span> page.locator(entry.xpath);                  <span class="c">// priority 4</span>
+}</pre>
+</div>
+
+<!-- ══ KATALON MAPPING ══════════════════════════════════════ -->
+<div class="page-section" id="sec-katalon">
+  <div class="page-header">
+    <div class="page-tag">Architecture</div>
+    <h1>Katalon → Playwright Mapping</h1>
+    <p class="page-sub">Every Katalon concept and its direct Playwright equivalent</p>
+  </div>
+
+  <div class="callout tip">
+    <div class="callout-ic">✅</div>
+    <div class="callout-body"><strong>For your team:</strong> The concepts are identical — only the technology changes. Groovy becomes TypeScript. XML config becomes JSON. WebUI.click() becomes page.click().</div>
+  </div>
+
+  <table class="map-table">
+    <thead>
+      <tr><th>Katalon Concept</th><th></th><th>Playwright Equivalent</th><th>Where in PlayArc</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="kat">Test Case</td><td class="arrow">→</td><td class="pw">test() block in .spec.ts</td><td>Builder → steps</td></tr>
+      <tr><td class="kat">Test Suite</td><td class="arrow">→</td><td class="pw">test.describe() + test.spec.ts file</td><td>Builder → suite</td></tr>
+      <tr><td class="kat">Test Suite Collection</td><td class="arrow">→</td><td class="pw">playwright.config.ts projects[] array</td><td>Runner → multi-suite</td></tr>
+      <tr><td class="kat">Object Repository</td><td class="arrow">→</td><td class="pw">objectRepo.ts helper + REPO map</td><td>Object Repo tab</td></tr>
+      <tr><td class="kat">findTestObject('Page/name')</td><td class="arrow">→</td><td class="pw">obj(page, 'Page/name') → Locator</td><td>Auto-generated</td></tr>
+      <tr><td class="kat">Custom Keywords (Groovy class)</td><td class="arrow">→</td><td class="pw">TypeScript class with async methods</td><td>Keyword Library tab</td></tr>
+      <tr><td class="kat">@Keyword annotation</td><td class="arrow">→</td><td class="pw">public async method() on the class</td><td>Keyword editor</td></tr>
+      <tr><td class="kat">CustomKeywords.'Pkg.method'()</td><td class="arrow">→</td><td class="pw">const kw = new PkgClass(page); await kw.method()</td><td>KW step in Builder</td></tr>
+      <tr><td class="kat">Test Data (Excel/CSV)</td><td class="arrow">→</td><td class="pw">Data table rows passed as data object</td><td>Data Tables tab</td></tr>
+      <tr><td class="kat">Data binding  #{variable}</td><td class="arrow">→</td><td class="pw">{{column}} token → data.column at runtime</td><td>Step value field</td></tr>
+      <tr><td class="kat">Execution Profile (GlobalVar)</td><td class="arrow">→</td><td class="pw">process.env.* + playwright.config baseURL</td><td>Env switcher (topbar)</td></tr>
+      <tr><td class="kat">Test Listeners @BeforeTestSuite</td><td class="arrow">→</td><td class="pw">test.beforeAll() in fixtures.ts</td><td>Listeners tab</td></tr>
+      <tr><td class="kat">Test Listeners @AfterTestSuite</td><td class="arrow">→</td><td class="pw">test.afterAll() in fixtures.ts</td><td>Listeners tab</td></tr>
+      <tr><td class="kat">Test Listeners @BeforeTestCase</td><td class="arrow">→</td><td class="pw">test.beforeEach() in fixtures.ts</td><td>Listeners tab</td></tr>
+      <tr><td class="kat">WebUI.click(obj)</td><td class="arrow">→</td><td class="pw">await page.click(selector)</td><td>CLICK step</td></tr>
+      <tr><td class="kat">WebUI.setText(obj, text)</td><td class="arrow">→</td><td class="pw">await page.fill(selector, text)</td><td>FILL step</td></tr>
+      <tr><td class="kat">WebUI.verifyTextPresent(text)</td><td class="arrow">→</td><td class="pw">await expect(locator).toContainText(text)</td><td>ASSERT step</td></tr>
+      <tr><td class="kat">WebUI.takeScreenshot()</td><td class="arrow">→</td><td class="pw">await page.screenshot({ path })</td><td>SHOT step</td></tr>
+      <tr><td class="kat">WebUI.executeJavaScript()</td><td class="arrow">→</td><td class="pw">await page.evaluate(() => {...})</td><td>JS step</td></tr>
+      <tr><td class="kat">KeywordUtil.logInfo()</td><td class="arrow">→</td><td class="pw">console.log() → captured by runner</td><td>Log panel</td></tr>
+      <tr><td class="kat">KeywordUtil.markFailed()</td><td class="arrow">→</td><td class="pw">throw new Error() — Playwright catches it</td><td>Automatic</td></tr>
+      <tr><td class="kat">Smart Wait</td><td class="arrow">→</td><td class="pw">Playwright auto-waits by default (no config needed)</td><td>Built-in</td></tr>
+      <tr><td class="kat">Allure Reporter</td><td class="arrow">→</td><td class="pw">@playwright/test built-in HTML reporter</td><td>Reports tab</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══ WEBSOCKET ════════════════════════════════════════════ -->
+<div class="page-section" id="sec-websocket">
+  <div class="page-header">
+    <div class="page-tag">Live Execution</div>
+    <h1>WebSocket Protocol</h1>
+    <p class="page-sub">Real-time run log streaming — everything the log panel displays comes through here</p>
+  </div>
+
+  <h2>Connection</h2>
+  <pre><span class="c">// Connect immediately after POST /suites/:id/run returns a 202</span>
+<span class="k">const</span> { runId } = <span class="k">await</span> fetch(...).then(r => r.json());
+<span class="k">const</span> ws = <span class="k">new</span> WebSocket(<span class="s">`ws://localhost:4000/ws?runId=</span><span class="m">${runId}</span><span class="s">`</span>);
+
+ws.onopen    = () => console.log(<span class="s">'connected'</span>);
+ws.onmessage = ({ data }) => handleEvent(JSON.parse(data));
+ws.onerror   = (e) => console.error(<span class="s">'WS error'</span>, e);
+ws.onclose   = () => console.log(<span class="s">'run stream closed'</span>);</pre>
+
+  <h2>Event Reference — Server → Client</h2>
+
+  <div class="ws-event">
+    <div class="ws-type">connected</div>
+    <div class="ws-when">On socket open</div>
+    <div class="ws-payload">{ type: "connected", runId: "run_abc", ts: 1718000000000 }</div>
+  </div>
+  <div class="ws-event">
+    <div class="ws-type">status</div>
+    <div class="ws-when">Run state change</div>
+    <div class="ws-payload">{ type: "status", status: "running" | "stopped", ts }</div>
+  </div>
+  <div class="ws-event">
+    <div class="ws-type">log</div>
+    <div class="ws-when">Every log line</div>
+    <div class="ws-payload">{ type: "log", level: "INFO"|"PASS"|"FAIL"|"WARN"|"STEP"|"HEAL"|"API"|"DATA", msg: string, ts }</div>
+  </div>
+  <div class="ws-event">
+    <div class="ws-type">step</div>
+    <div class="ws-when">Each PW step start/end</div>
+    <div class="ws-payload">{ type: "step", status: "running"|"passed"|"failed", title, duration?: number, error?: string, ts }</div>
+  </div>
+  <div class="ws-event">
+    <div class="ws-type">heal</div>
+    <div class="ws-when">Selector auto-healed</div>
+    <div class="ws-payload">{ type: "heal", original: string, healed: string, strategy: "aria"|"testid"|"css"|"xpath", ts }</div>
+  </div>
+  <div class="ws-event">
+    <div class="ws-type">complete</div>
+    <div class="ws-when">Run finished</div>
+    <div class="ws-payload">{ type: "complete", status: "passed"|"failed", passed: number, failed: number, duration: number, ts }</div>
+  </div>
+  <div class="ws-event">
+    <div class="ws-type">error</div>
+    <div class="ws-when">Unexpected crash</div>
+    <div class="ws-payload">{ type: "error", msg: string, ts }</div>
+  </div>
+  <div class="ws-event">
+    <div class="ws-type">stopped</div>
+    <div class="ws-when">Manual stop request</div>
+    <div class="ws-payload">{ type: "stopped", ts }</div>
+  </div>
+
+  <h2>Client → Server Message</h2>
+  <pre><span class="c">// Stop an active run early</span>
+ws.send(JSON.stringify({ type: <span class="s">"stop"</span> }));</pre>
+
+  <h2>Log Levels Explained</h2>
+  <table class="map-table">
+    <thead><tr><th>Level</th><th>When used</th><th>UI color</th></tr></thead>
+    <tbody>
+      <tr><td><code>INFO</code></td><td>General messages, startup, run metadata</td><td style="color:var(--cyan)">Cyan</td></tr>
+      <tr><td><code>STEP</code></td><td>Each test step begins (highlighted row)</td><td style="color:var(--purple)">Purple</td></tr>
+      <tr><td><code>PASS</code></td><td>Step completed successfully</td><td style="color:var(--green)">Green</td></tr>
+      <tr><td><code>FAIL</code></td><td>Step or assertion failed</td><td style="color:var(--red)">Red</td></tr>
+      <tr><td><code>WARN</code></td><td>Non-fatal issues, deprecated selectors</td><td style="color:var(--yellow)">Yellow</td></tr>
+      <tr><td><code>HEAL</code></td><td>Self-healing triggered and resolved</td><td style="color:var(--orange)">Orange</td></tr>
+      <tr><td><code>API</code></td><td>API call log line (method, path, status)</td><td style="color:#009DC4">Cyan dim</td></tr>
+      <tr><td><code>DATA</code></td><td>Data binding resolved ({{col}} → value)</td><td style="color:var(--yellow)">Yellow</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Complete Handler Example</h2>
+  <pre><span class="k">function</span> handleEvent(event) {
+  <span class="k">switch</span> (event.type) {
+
+    <span class="k">case</span> <span class="s">'log'</span>:
+      appendToLogPanel(event.level, event.msg, event.ts);
+      <span class="k">break</span>;
+
+    <span class="k">case</span> <span class="s">'step'</span>:
+      updateStepStatus(event.title, event.status, event.duration);
+      <span class="k">if</span> (event.error) showStepError(event.title, event.error);
+      <span class="k">break</span>;
+
+    <span class="k">case</span> <span class="s">'heal'</span>:
+      showHealNotification(event.original, event.healed, event.strategy);
+      incrementHealCounter();
+      <span class="k">break</span>;
+
+    <span class="k">case</span> <span class="s">'complete'</span>:
+      showRunSummary(event.status, event.passed, event.failed, event.duration);
+      ws.close();  <span class="c">// done — close the connection</span>
+      <span class="k">break</span>;
+
+    <span class="k">case</span> <span class="s">'error'</span>:
+      showError(event.msg);
+      ws.close();
+      <span class="k">break</span>;
+  }
+}</pre>
+</div>
+
+<!-- ══ QUICK START ══════════════════════════════════════════ -->
+<div class="page-section" id="sec-quickstart">
+  <div class="page-header">
+    <div class="page-tag">Setup</div>
+    <h1>Quick Start</h1>
+    <p class="page-sub">Get the server running and connected to the PlayArc UI in under 10 minutes</p>
+  </div>
+
+  <h2>1 — Install</h2>
+  <pre>cd playarc-server
+npm install
+npx playwright install    <span class="c"># downloads Chromium, Firefox, WebKit</span></pre>
+
+  <h2>2 — Start the server</h2>
+  <pre>node server.js
+
+<span class="c">╔════════════════════════════════════════╗
+║  PlayArc Server  →  localhost:4000     ║
+║  REST   http://localhost:4000/api      ║
+║  WS     ws://localhost:4000/ws         ║
+╚════════════════════════════════════════╝</span></pre>
+
+  <h2>3 — Connect the UI</h2>
+  <p>Open <code>PlayArc-v2-Final.html</code> in any browser. The API bar at the top will show live calls immediately. No other config needed — <code>BASE_URL</code> is already set to <code>localhost:4000</code>.</p>
+
+  <div class="callout warn">
+    <div class="callout-ic">⚠️</div>
+    <div class="callout-body"><strong>CORS note:</strong> The server allows all origins (<code>*</code>) for development. Lock this down before exposing to a network.</div>
+  </div>
+
+  <h2>4 — Run a test</h2>
+  <pre><span class="c"># In the UI: click ▶ Run in the topbar
+# Or directly via curl:</span>
+curl -X POST http://localhost:4000/api/suites/1/run \
+     -H "Content-Type: application/json" \
+     -d '{"browser":"chromium","headless":true}'
+
+<span class="c"># Returns:</span>
+{ "runId": "run_a3f2b8c1", "status": "queued", "suite": "Login Flow" }</pre>
+
+  <h2>5 — Environment variables</h2>
+  <pre>PORT=4000           <span class="c"># server port (default: 4000)</span>
+DB_PATH=./playarc.db  <span class="c"># SQLite file location</span>
+TESTS_DIR=./generated-tests   <span class="c"># where .spec.ts files are written</span>
+RESULTS_DIR=./test-results    <span class="c"># Playwright output</span>
+SHOTS_DIR=./screenshots       <span class="c"># screenshot storage</span></pre>
+
+  <h2>Files Delivered</h2>
+  <table class="map-table">
+    <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>PlayArc-v2-Final.html</code></td><td>Complete UI — open in any browser, no build step</td></tr>
+      <tr><td><code>server.js</code></td><td>Full Node.js backend — production-ready starter</td></tr>
+      <tr><td><code>package.json</code></td><td>npm dependencies for the server</td></tr>
+      <tr><td><code>PlayArc-API-Contract.docx</code></td><td>Full REST + WebSocket API specification</td></tr>
+      <tr><td><code>PlayArc-Developer-Reference.html</code></td><td>This document — architecture, file structure, WS spec</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══ STUB PAGES ═══════════════════════════════════════════ -->
+<div class="page-section" id="sec-suites">
+  <div class="page-header"><div class="page-tag">API</div><h1>Suites &amp; Runs</h1><p class="page-sub">See the API Contract document for full request/response shapes</p></div>
+  <div class="callout info"><div class="callout-ic">📄</div><div class="callout-body">Full endpoint specs are in <strong>PlayArc-API-Contract.docx</strong> — Sections 1 and 2. This reference focuses on the architecture. Key endpoints: <code>GET /suites</code> · <code>POST /suites</code> · <code>POST /suites/:id/run</code> · <code>GET /runs/:runId/results</code></div></div>
+  <h2>Run Lifecycle States</h2>
+  <pre>queued → running → passed
+                 ↘ failed
+                 ↘ stopped (manual)
+                 ↘ error   (crash)</pre>
+</div>
+<div class="page-section" id="sec-objects">
+  <div class="page-header"><div class="page-tag">API</div><h1>Object Repository</h1><p class="page-sub">See the API Contract document — Section 2</p></div>
+  <div class="callout info"><div class="callout-ic">📄</div><div class="callout-body">Endpoints: <code>GET /objects</code> · <code>POST /objects</code> · <code>PUT /objects/:id</code> · <code>DELETE /objects/:id</code><br>The <code>obj(page, 'Page/Name')</code> helper resolves these at test runtime in priority order: <strong>data-testid → aria-label → css → xpath</strong></div></div>
+</div>
+<div class="page-section" id="sec-tables">
+  <div class="page-header"><div class="page-tag">API</div><h1>Data Tables</h1><p class="page-sub">See the API Contract document — Section 3</p></div>
+  <div class="callout info"><div class="callout-ic">📄</div><div class="callout-body">Endpoints: <code>GET /tables</code> · <code>POST /tables</code> · <code>PUT /tables/:id</code> · <code>DELETE /tables/:id</code><br>At runtime, <code>{{columnName}}</code> tokens in step values are replaced with <code>data.columnName</code> from the bound table row.</div></div>
+</div>
+<div class="page-section" id="sec-heal">
+  <div class="page-header"><div class="page-tag">API</div><h1>Self-Heal &amp; Inspect</h1><p class="page-sub">See the API Contract document — Section 5</p></div>
+  <div class="callout tip"><div class="callout-ic">⚡</div><div class="callout-body"><strong>Self-heal flow:</strong> Playwright step fails → server catches error → calls POST /heal with primary selector + fallbacks → tries each fallback against live page → returns first that resolves → run continues with healed selector → WS broadcasts a 'heal' event to the UI.</div></div>
+</div>
+<div class="page-section" id="sec-codegen">
+  <div class="page-header"><div class="page-tag">Live Execution</div><h1>Code Generation</h1><p class="page-sub">What the server writes to disk before every run</p></div>
+  <p>See the <strong>File Structure</strong> section for full generated file examples. The server calls these functions in order on every run:</p>
+  <pre><span class="n">writeKeywordFiles</span>()   <span class="c">// → generated-tests/keywords/*.ts</span>
+<span class="n">writeObjectRepoHelper</span>() <span class="c">// → generated-tests/helpers/objectRepo.ts</span>
+<span class="n">writeListenerFile</span>()   <span class="c">// → generated-tests/helpers/fixtures.ts</span>
+<span class="n">generateSpec</span>()        <span class="c">// → generated-tests/specs/SuiteName-runId.spec.ts</span></pre>
+</div>
+
+</div><!-- .content -->
+</main>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const sec = document.getElementById('sec-' + id);
+  if (sec) sec.classList.add('active');
+  event.target.classList.add('active');
+  document.querySelector('main').scrollTop = 0;
+}
+</script>
+</body>
+</html>
