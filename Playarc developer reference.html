@@ -509,16 +509,40 @@ RESULTS_DIR=./test-results    <span class="c"># Playwright output</span>
 SHOTS_DIR=./screenshots       <span class="c"># screenshot storage</span></pre>
 
   <h2>Files Delivered</h2>
-  <table class="map-table">
-    <thead><tr><th>File</th><th>Purpose</th></tr></thead>
-    <tbody>
-      <tr><td><code>PlayArc-v2-Final.html</code></td><td>Complete UI — open in any browser, no build step</td></tr>
-      <tr><td><code>server.js</code></td><td>Full Node.js backend — production-ready starter</td></tr>
-      <tr><td><code>package.json</code></td><td>npm dependencies for the server</td></tr>
-      <tr><td><code>PlayArc-API-Contract.docx</code></td><td>Full REST + WebSocket API specification</td></tr>
-      <tr><td><code>PlayArc-Developer-Reference.html</code></td><td>This document — architecture, file structure, WS spec</td></tr>
-    </tbody>
-  </table>
+  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+    <a href="PlayArc-v2-Final.html" target="_blank" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg2);border:1px solid var(--b2);border-radius:7px;text-decoration:none;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--cyan)'" onmouseout="this.style.borderColor='var(--b2)'">
+      <span style="font-size:22px;flex-shrink:0;">🌐</span>
+      <div>
+        <div style="font-family:var(--fm);font-size:12px;font-weight:700;color:var(--cyan);">PlayArc-v2-Final.html</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px;">Complete UI — open in any browser, no build step required</div>
+      </div>
+      <span style="margin-left:auto;font-size:10px;color:var(--t3);flex-shrink:0;">↗ Open</span>
+    </a>
+    <a href="server.js" download style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg2);border:1px solid var(--b2);border-radius:7px;text-decoration:none;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--b2)'">
+      <span style="font-size:22px;flex-shrink:0;">⚙️</span>
+      <div>
+        <div style="font-family:var(--fm);font-size:12px;font-weight:700;color:var(--green);">server.js</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px;">Full Node.js backend — Express + WebSocket + Playwright runner · 828 lines</div>
+      </div>
+      <span style="margin-left:auto;font-size:10px;color:var(--t3);flex-shrink:0;">↓ Download</span>
+    </a>
+    <a href="package.json" download style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg2);border:1px solid var(--b2);border-radius:7px;text-decoration:none;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--yellow)'" onmouseout="this.style.borderColor='var(--b2)'">
+      <span style="font-size:22px;flex-shrink:0;">📦</span>
+      <div>
+        <div style="font-family:var(--fm);font-size:12px;font-weight:700;color:var(--yellow);">package.json</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px;">npm dependencies — express · ws · better-sqlite3 · @playwright/test</div>
+      </div>
+      <span style="margin-left:auto;font-size:10px;color:var(--t3);flex-shrink:0;">↓ Download</span>
+    </a>
+    <a href="PlayArc-API-Contract.docx" download style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg2);border:1px solid var(--b2);border-radius:7px;text-decoration:none;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--b2)'">
+      <span style="font-size:22px;flex-shrink:0;">📋</span>
+      <div>
+        <div style="font-family:var(--fm);font-size:12px;font-weight:700;color:var(--purple);">PlayArc-API-Contract.docx</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:2px;">Full REST + WebSocket API specification — all endpoints, schemas, error shapes</div>
+      </div>
+      <span style="margin-left:auto;font-size:10px;color:var(--t3);flex-shrink:0;">↓ Download</span>
+    </a>
+  </div>
 </div>
 
 <!-- ══ STUB PAGES ═══════════════════════════════════════════ -->
